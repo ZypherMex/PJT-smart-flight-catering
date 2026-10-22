@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Smart Flight Catering & AI Health-Based Meal Recommendation System</title>
+<style>
+  :root {
+    --navy: #10324a;
+    --blue: #1f6f8b;
+    --accent: #e8853a;
+    --paper: #ffffff;
+    --muted: #5c6b74;
+    --line: #d8e2e6;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Segoe UI", Calibri, Arial, sans-serif;
+    background: #eef2f4;
+    display: flex;
+    justify-content: center;
+    padding: 40px 0;
+  }
+  .page {
+    width: 850px;
+    min-height: 1100px;
+    background: var(--paper);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+    position: relative;
+    padding: 0;
+    overflow: hidden;
+  }
+  .top-bar {
+    height: 10px;
+    background: linear-gradient(90deg, var(--navy), var(--blue), var(--accent));
+  }
+  .header {
+    padding: 70px 70px 40px 70px;
+  }
+  .kicker {
+    color: var(--accent);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 18px;
+  }
+  h1 {
+    font-size: 40px;
+    line-height: 1.2;
+    color: var(--navy);
+    margin: 0 0 14px 0;
+    font-weight: 700;
+  }
+  .subtitle {
+    font-size: 17px;
+    color: var(--muted);
+    max-width: 560px;
+    line-height: 1.5;
+    margin-bottom: 36px;
+  }
+  .meta-row {
+    display: flex;
+    gap: 40px;
+    border-top: 1px solid var(--line);
+    padding-top: 20px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .meta-row div span {
+    display: block;
+    color: var(--navy);
+    font-weight: 600;
+    font-size: 14px;
+    margin-top: 2px;
+  }
+  .modules {
+    padding: 10px 70px 40px 70px;
+  }
+  .modules h3 {
+    font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--blue);
+    margin-bottom: 18px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 14px;
+  }
+  .card {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 16px 16px 14px;
+    background: #f8fafb;
+  }
+  .card .icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 6px;
+    background: var(--blue);
+    margin-bottom: 10px;
+  }
+  .card .label {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--navy);
+  }
+  .restrictions {
+    padding: 10px 70px 50px 70px;
+  }
+  .restrictions h3 {
+    font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--blue);
+    margin-bottom: 18px;
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .tag {
+    font-size: 12.5px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: #eef2f4;
+    color: var(--navy);
+    border: 1px solid var(--line);
+  }
+  .tag.allergy { border-color: #f0c4a8; background: #fdf1e8; color: #a85a1f; }
+  .tag.medical { border-color: #c8dce6; background: #eaf3f6; color: var(--blue); }
+  .footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    padding: 18px 70px;
+    font-size: 10.5px;
+    color: #8a9aa3;
+    border-top: 1px solid var(--line);
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+    <div class="top-bar"></div>
+    <div class="header">
+      <div class="kicker">Internship Capstone Project Proposal</div>
+      <h1>Smart Flight Catering &amp;<br>AI Health-Based Meal<br>Recommendation System</h1>
+      <div class="subtitle">
+        An intelligent airline catering platform combining AI-driven meal recommendations,
+        passenger health profiling, operational analytics, and quality assurance monitoring.
+      </div>
+      <div class="meta-row">
+        <div>Document Type<span>Project Proposal</span></div>
+        <div>Prepared For<span>Internship Review</span></div>
+        <div>Status<span>Draft v1.0</span></div>
+      </div>
+    </div>
+
+    <div class="modules">
+      <h3>Platform Modules</h3>
+      <div class="grid">
+        <div class="card"><div class="icon"></div><div class="label">AI Recommendation Dashboard</div></div>
+        <div class="card"><div class="icon"></div><div class="label">Operations Dashboard</div></div>
+        <div class="card"><div class="icon"></div><div class="label">QA Dashboard</div></div>
+        <div class="card"><div class="icon"></div><div class="label">Test Management</div></div>
+        <div class="card"><div class="icon"></div><div class="label">Reporting &amp; Analytics</div></div>
+        <div class="card"><div class="icon"></div><div class="label">Catering Demand Forecasting</div></div>
+      </div>
+    </div>
+
+    <div class="restrictions">
+      <h3>Passenger Profile Signals</h3>
+      <div class="tags">
+        <span class="tag allergy">Peanuts</span>
+        <span class="tag allergy">Eggs</span>
+        <span class="tag allergy">Milk / Dairy</span>
+        <span class="tag allergy">Sesame</span>
+        <span class="tag allergy">Soy</span>
+        <span class="tag">Lactose / Gluten Intolerance</span>
+        <span class="tag medical">Diabetes</span>
+        <span class="tag medical">High Blood Pressure</span>
+        <span class="tag medical">High Cholesterol</span>
+        <span class="tag medical">Heart Disease</span>
+        <span class="tag medical">Kidney Disease</span>
+        <span class="tag">Vegetarian / Vegan</span>
+        <span class="tag">Halal</span>
+      </div>
+    </div>
+
+    <div class="footer">BUSINESS DOCUMENT — This document is intended for business use and should be distributed to intended recipients only.</div>
+  </div>
+</body>
+</html>

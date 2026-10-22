@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Emirates A350-900 — Seat & Dining Preferences</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="wordmark">fly<span>cater</span><span class="dot">.</span></div>
+      <nav class="topbar-nav">
+        <a class="active" href="#">Seat Map</a>
+        <a href="#">Dining</a>
+        <a href="#">Operations</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-eyebrow">A350&#8209;900 &middot; Fly Better</div>
+      <h1>Seat &amp; dining<br>preferences.</h1>
+      <p class="hero-sub">Select any seat to review allergies, medical needs and dining selections. Nose (Row 1) at left &rarr; Tail (Row 43) at right.</p>
+    </div>
+    <div class="hero-controls">
+      <div class="control-group">
+        <label for="haulSelect">Haul Length</label>
+        <select id="haulSelect">
+          <option value="shortHaul">Short Haul</option>
+          <option value="mediumHaul">Medium Haul</option>
+          <option value="longHaul">Long Haul</option>
+        </select>
+      </div>
+      <div class="control-group">
+        <label for="timeSelect">Time of Day</label>
+        <select id="timeSelect">
+          <option value="breakfast">Breakfast</option>
+          <option value="lunchDinner">Lunch/Dinner</option>
+          <option value="eveningSnack">Evening/Snack</option>
+        </select>
+      </div>
+    </div>
+  </section>
+
+  <main class="main-content">
+    <section class="card seatmap-card">
+      <div class="card-header">
+        <div class="legend">
+          <span><span class="swatch sw-first"></span>First Class</span>
+          <span><span class="swatch sw-business"></span>Business Class</span>
+          <span><span class="swatch sw-economy"></span>Economy Class</span>
+          <span><span class="sw-dot"></span>Has saved preferences</span>
+        </div>
+        <div class="nose-tail-bar">
+          <span>&#9992; Nose &middot; Row 1</span>
+          <span>Tail &middot; Row 43 &#9992;</span>
+        </div>
+      </div>
+      <div class="seatmap-viewport">
+        <div class="seatmap-scale" id="seatmap"><div class="panel-placeholder">Loading seat map&hellip;</div></div>
+      </div>
+    </section>
+
+    <section class="card panel-card" id="panel-wrap">
+      <div id="panel"><div class="panel-placeholder">Select a seat on the map above to view and edit meal, allergy and dining preferences.</div></div>
+    </section>
+  </main>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
