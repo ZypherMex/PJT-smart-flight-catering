@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seat — Smart Catering</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="wordmark" href="index.html">fly<span>cater</span><span class="dot">.</span></a>
+      <nav class="topbar-nav">
+        <a href="index.html">Fleet</a>
+        <a href="a350.html">Seat Map</a>
+        <a href="menu.html">Dining</a>
+        <a href="#">Operations</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-eyebrow">Passenger Seat &middot; Fly Better</div>
+      <h1 id="seatHeading">Seat &mdash;</h1>
+      <p class="hero-sub">Review your health conditions and dietary needs, tick the menu items you're interested in, and get an AI meal recommendation built only from what's actually on your flight's menu.</p>
+    </div>
+    <div class="hero-controls">
+      <div class="control-group">
+        <label for="haulSelect">Haul Length</label>
+        <select id="haulSelect">
+          <option value="shortHaul">Short Haul</option>
+          <option value="mediumHaul">Medium Haul</option>
+          <option value="longHaul">Long Haul</option>
+        </select>
+      </div>
+    </div>
+  </section>
+
+  <main class="main-content">
+    <section class="card" id="prefsCard">
+      <div class="card-header">
+        <h2 class="menu-section-title" style="margin:0;">Health Conditions &amp; Dietary Needs</h2>
+      </div>
+      <div id="prefsContent"><div class="panel-placeholder">Loading&hellip;</div></div>
+      <div class="save-indicator" id="saveIndicator" style="margin-top:10px;display:block;">Saved &#10003;</div>
+    </section>
+
+    <section class="card" id="menuCard">
+      <div class="card-header">
+        <h2 class="menu-section-title" style="margin:0;">Available Menu — Tick what interests you</h2>
+      </div>
+      <div id="menuContent"><div class="panel-placeholder">Loading menu&hellip;</div></div>
+    </section>
+
+    <section class="card" id="recommendCard">
+      <div class="card-header">
+        <h2 class="menu-section-title" style="margin:0;">AI Meal Recommendation</h2>
+      </div>
+      <p class="page-subtitle" style="margin:0 0 16px;">Based only on meals available on this flight — the AI never suggests a dish that isn't on the menu above.</p>
+      <button type="button" id="recommendBtn" class="randomize-btn" style="background:var(--emirates-red);border-color:var(--emirates-red);">Get AI Recommendation</button>
+      <div id="recommendResult" style="margin-top:20px;"></div>
+    </section>
+  </main>
+
+  <script type="module" src="js/seat.js"></script>
+</body>
+</html>

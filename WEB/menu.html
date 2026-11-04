@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Emirates — Dining Menu</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="wordmark" href="index.html">fly<span>cater</span><span class="dot">.</span></a>
+      <nav class="topbar-nav">
+        <a href="index.html">Fleet</a>
+        <a href="a350.html">Seat Map</a>
+        <a class="active" href="menu.html">Dining</a>
+        <a href="#">Operations</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-eyebrow">Onboard Dining &middot; Fly Better</div>
+      <h1>Explore the<br>menu.</h1>
+      <p class="hero-sub">Browse dishes and drinks by class and flight duration. Scroll or swipe each row to see more.</p>
+    </div>
+  </section>
+
+  <main class="main-content">
+    <section class="card menu-tabs-card">
+      <div class="tab-row" id="classTabs">
+        <button type="button" class="tab-btn active" data-class-type="First">First Class</button>
+        <button type="button" class="tab-btn" data-class-type="Business">Business Class</button>
+        <button type="button" class="tab-btn" data-class-type="Economy">Economy Class</button>
+      </div>
+      <div class="tab-row tab-row-secondary" id="haulTabs">
+        <button type="button" class="tab-btn tab-btn-secondary active" data-haul-length="shortHaul">Short Haul</button>
+        <button type="button" class="tab-btn tab-btn-secondary" data-haul-length="mediumHaul">Medium Haul</button>
+        <button type="button" class="tab-btn tab-btn-secondary" data-haul-length="longHaul">Long Haul</button>
+      </div>
+    </section>
+
+    <div id="menuContent">
+      <div class="panel-placeholder">Loading menu&hellip;</div>
+    </div>
+  </main>
+
+  <script type="module" src="js/menu.js"></script>
+</body>
+</html>

@@ -1,3 +1,7 @@
 node_modules/
-database/*.sqlite
+DATABASE/*.sqlite
+DATABASE/*.sqlite-wal
+DATABASE/*.sqlite-shm
+DATABASE/*.sqlite-journal
 npm-debug.log*
+.env

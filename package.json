@@ -2,14 +2,17 @@
   "name": "smart-flight-catering",
   "version": "1.0.0",
   "description": "Emirates A350-900 seat map and dining preference system",
-  "main": "backend/server.js",
+  "main": "API/server.js",
   "scripts": {
-    "start": "node backend/server.js",
-    "dev": "nodemon backend/server.js"
+    "start": "node API/server.js",
+    "dev": "nodemon API/server.js"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^1.3.0",
     "better-sqlite3": "^11.3.0",
-    "express": "^4.21.1"
+    "dotenv": "^18.0.9",
+    "express": "^4.21.1",
+    "undici": "^7.30.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.7"
