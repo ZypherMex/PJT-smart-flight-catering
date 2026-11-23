@@ -11,6 +11,7 @@ const TIME_LABELS = {
   lunchDinner: 'Lunch/Dinner (11:00–18:59)',
   eveningSnack: 'Evening/Snack (19:00–04:59)',
 };
+const TIME_SHORT_LABELS = { breakfast: 'Breakfast', lunchDinner: 'Lunch/Dinner', eveningSnack: 'Evening/Snack' };
 const GROUP_LABELS = [
   ['allergies', 'Allergies'],
   ['intolerances', 'Intolerances'],
@@ -96,11 +97,30 @@ function renderDiningSection(cabinKey, diningData, haul, time, prefs) {
   </div>`;
 }
 
-function renderAiSuggestionSection(seatId) {
+function renderHaulTimeControls(haul, time) {
+  const haulOptions = Object.entries(HAUL_LABELS)
+    .map(([val, label]) => `<option value="${val}" ${val === haul ? 'selected' : ''}>${label}</option>`)
+    .join('');
+  const timeOptions = Object.entries(TIME_SHORT_LABELS)
+    .map(([val, label]) => `<option value="${val}" ${val === time ? 'selected' : ''}>${label}</option>`)
+    .join('');
+  return `<div class="panel-controls">
+    <div class="control-group">
+      <label for="panelHaulSelect">Your flight's haul length</label>
+      <select id="panelHaulSelect">${haulOptions}</select>
+    </div>
+    <div class="control-group">
+      <label for="panelTimeSelect">Time of day for food</label>
+      <select id="panelTimeSelect">${timeOptions}</select>
+    </div>
+  </div>`;
+}
+
+function renderOrderFoodSection(seatId) {
   return `<div class="ai-suggestion-section">
-    <h3>AI Suggestion <span class="badge ai-badge">Live</span></h3>
-    <p>Open this seat's full page to tick menu items and get an AI meal recommendation built only from the real flight menu.</p>
-    <a href="seat.html?seat=${encodeURIComponent(seatId)}" class="ai-suggest-btn" style="display:inline-block;text-decoration:none;cursor:pointer;">Open Full Seat Page &#8599;</a>
+    <h3>Order Your Food <span class="badge ai-badge">Live</span></h3>
+    <p>Tick the menu items you're interested in and get an AI meal recommendation built only from the real flight menu.</p>
+    <a href="seat.html?seat=${encodeURIComponent(seatId)}" class="ai-suggest-btn">Continue to order food &#8599;</a>
   </div>`;
 }
 
@@ -120,8 +140,9 @@ function render() {
       <button type="button" id="closePanelBtn" class="close-btn">&#10005; Close</button>
     </div>
     ${renderCheckboxGroups(diningMatrix.preferenceGroups, prefs.checks)}
+    ${renderHaulTimeControls(haul, time)}
     ${renderDiningSection(cabin.key, diningMatrix.dining, haul, time, prefs)}
-    ${renderAiSuggestionSection(seatId)}
+    ${renderOrderFoodSection(seatId)}
   `;
 
   document.getElementById('closePanelBtn').addEventListener('click', () => {
@@ -133,6 +154,16 @@ function render() {
   });
   container.querySelectorAll('input[name="mealChoice"]').forEach((input) => {
     input.addEventListener('change', onMealChoiceChange);
+  });
+  document.getElementById('panelHaulSelect').addEventListener('change', (e) => {
+    currentSeatState.haul = e.target.value;
+    render();
+    scheduleSave();
+  });
+  document.getElementById('panelTimeSelect').addEventListener('change', (e) => {
+    currentSeatState.time = e.target.value;
+    render();
+    scheduleSave();
   });
 }
 
@@ -148,11 +179,13 @@ function scheduleSave() {
   clearTimeout(saveTimer);
   saveTimer = setTimeout(async () => {
     if (!currentSeatState) return;
-    const { seatId, prefs } = currentSeatState;
+    const { seatId, prefs, haul, time } = currentSeatState;
     await putSeatPreferences(seatId, {
       checks: prefs.checks,
       mealChoice: prefs.mealChoice,
       mealChoiceContext: prefs.mealChoiceContext,
+      haulLength: haul,
+      mealTime: time,
     });
     showSavedIndicator();
     if (currentSeatState) currentSeatState.onSaved?.(seatId);
@@ -177,16 +210,11 @@ function onMealChoiceChange(e) {
   scheduleSave();
 }
 
-export async function openSeatPanel(seatId, cabin, diningMatrix, haul, time, onSaved) {
+export async function openSeatPanel(seatId, cabin, diningMatrix, onSaved) {
   const prefs = await getSeatPreferences(seatId);
+  const haul = prefs.haulLength || 'shortHaul';
+  const time = prefs.mealTime || 'lunchDinner';
   currentSeatState = { seatId, cabin, prefs, diningMatrix, haul, time, onSaved };
-  render();
-}
-
-export function updateGlobalContext(haul, time) {
-  if (!currentSeatState) return;
-  currentSeatState.haul = haul;
-  currentSeatState.time = time;
   render();
 }
 

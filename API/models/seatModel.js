@@ -4,6 +4,7 @@ function getAllSeatsWithPreferenceFlag() {
   return db
     .prepare(
       `SELECT s.seat_id AS seatId, s.row_number AS row, s.seat_letter AS letter, s.class_type AS classType,
+              p.meal_choice AS mealChoice, p.haul_length AS haulLength, p.meal_time AS mealTime,
               CASE WHEN p.seat_id IS NOT NULL AND (
                 p.peanut_allergy = 1 OR p.egg_allergy = 1 OR p.milk_allergy = 1 OR p.sesame_allergy = 1 OR p.soy_allergy = 1 OR
                 p.lactose_gluten_intolerance = 1 OR p.diabetes = 1 OR p.high_blood_pressure = 1 OR p.high_cholesterol = 1 OR

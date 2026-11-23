@@ -9,8 +9,36 @@
 // here; populate it later to swap the placeholder for a real photo with no
 // markup changes needed).
 
+// Dish name -> uploaded photo, served from WEB/images/menu/. Add an entry here
+// whenever a new photo is dropped in; item() looks it up automatically so the
+// menu sections below don't need to be touched by hand.
+const DISH_PHOTOS = {
+  'Apple Caramel Mousse': '/images/menu/apple-caramel-mousse.png',
+  'Arabic Dips': '/images/menu/arabic-dips.png',
+  'Batata wa Bayd Mfarakeh': '/images/menu/batata-wa-bayd-mfarakeh.png',
+  'Bzar Chicken': '/images/menu/bzar-chicken.png',
+  'Cheese Board': '/images/menu/cheese-board.png',
+  'Chicken Kebab': '/images/menu/chicken-kebab.png',
+  'Chocolate Mango Tart': '/images/menu/chocolate-mango-tart.png',
+  'Cream of Mushroom Soup': '/images/menu/cream-of-mushroom-soup.png',
+  'Grilled Chicken': '/images/menu/grilled-chicken.png',
+  'Kale and Spinach Frittata': '/images/menu/kale-and-spinach-frittata.png',
+  'Kofta Sweet and Sour': '/images/menu/kofta-sweet-and-sour.png',
+  'Mozzarella and Sundried Tomato Sandwich': '/images/menu/mozzarella-and-sundried-tomato-sandwich.png',
+  'Pan-fried Beef Tenderloin': '/images/menu/pan-fried-beef-tenderloin.png',
+  'Pan-seared Salmon Trout': '/images/menu/pan-seared-salmon-trout.png',
+  Pav: '/images/menu/pav.png',
+  'Scrambled Eggs with Turkey Rashers': '/images/menu/scrambled-eggs-with-turkey-rashers.png',
+  'Scrambled Eggs': '/images/menu/scrambled-eggs.png',
+  'Spiced Bean Curd and Peppers': '/images/menu/spiced-bean-curd-and-peppers.png',
+  'Stir-fried Vegetable Noodles': '/images/menu/stir-fried-vegetable-noodles.png',
+  'Tofu Poke Bowl': '/images/menu/tofu-poke-bowl.png',
+  'Vegetable Paella': '/images/menu/vegetable-paella.png',
+  Waffles: '/images/menu/waffles.png',
+};
+
 function item(name, description, icon, dietaryTag) {
-  return { name, description, icon, dietaryTag: dietaryTag || null };
+  return { name, description, icon, dietaryTag: dietaryTag || null, imageUrl: DISH_PHOTOS[name] || null };
 }
 
 const MENU_CATALOG = {

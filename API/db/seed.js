@@ -2,6 +2,19 @@ const db = require('./connection');
 const { generateAllSeats } = require('../data/seatGrid');
 const { MENU_CATALOG } = require('../data/menuCatalog');
 
+// CREATE TABLE IF NOT EXISTS (in schema.sql) never adds columns to a table
+// that already exists, so a DB created before haul_length/meal_time existed
+// needs them added by hand, once, on startup.
+function migrateSeatPreferencesColumns() {
+  const columns = db.prepare('PRAGMA table_info(seat_preferences)').all().map((col) => col.name);
+  if (!columns.includes('haul_length')) {
+    db.exec('ALTER TABLE seat_preferences ADD COLUMN haul_length TEXT');
+  }
+  if (!columns.includes('meal_time')) {
+    db.exec('ALTER TABLE seat_preferences ADD COLUMN meal_time TEXT');
+  }
+}
+
 function seedSeatsIfEmpty() {
   const { count } = db.prepare('SELECT COUNT(*) AS count FROM seats').get();
   if (count > 0) return count;
@@ -64,4 +77,28 @@ function seedMenuIfEmpty() {
   return itemCount;
 }
 
-module.exports = { seedSeatsIfEmpty, seedMenuIfEmpty };
+// Runs every startup (not just on first seed) so a photo added to
+// menuCatalog.js later shows up immediately, without wiping the menu table.
+function syncMenuImages() {
+  const update = db.prepare('UPDATE menu_items SET image_url = ? WHERE name = ? AND image_url IS NOT ?');
+  let updated = 0;
+
+  const updateAll = db.transaction(() => {
+    for (const haulMap of Object.values(MENU_CATALOG)) {
+      for (const sections of Object.values(haulMap)) {
+        for (const section of sections) {
+          for (const dish of section.items) {
+            if (!dish.imageUrl) continue;
+            const { changes } = update.run(dish.imageUrl, dish.name, dish.imageUrl);
+            updated += changes;
+          }
+        }
+      }
+    }
+  });
+
+  updateAll();
+  return updated;
+}
+
+module.exports = { migrateSeatPreferencesColumns, seedSeatsIfEmpty, seedMenuIfEmpty, syncMenuImages };

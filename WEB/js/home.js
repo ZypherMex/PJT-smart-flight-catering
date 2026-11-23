@@ -1,5 +1,12 @@
 import { getFleet } from './api.js';
 
+// Fleet/flight selection is crew-only — anyone landing here without having
+// passed the passkey prompt on the role-selector page gets sent back there.
+if (sessionStorage.getItem('crewUnlocked') !== '1') {
+  window.location.replace('index.html');
+  throw new Error('redirecting to role selector');
+}
+
 function renderFleetCard(aircraft) {
   const isAvailable = aircraft.status === 'available';
   const seatInfo = aircraft.totalSeats ? `${aircraft.totalSeats} seats` : 'Seat map coming soon';

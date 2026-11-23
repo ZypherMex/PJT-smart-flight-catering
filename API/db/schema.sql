@@ -22,6 +22,8 @@ CREATE TABLE IF NOT EXISTS seat_preferences (
   halal                      INTEGER NOT NULL DEFAULT 0,
   meal_choice                TEXT,
   meal_choice_context        TEXT,
+  haul_length                TEXT,
+  meal_time                  TEXT,
   updated_at                 TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 

@@ -58,6 +58,7 @@ function scheduleSave() {
       checks: state.prefs.checks,
       mealChoice: state.prefs.mealChoice,
       mealChoiceContext: state.prefs.mealChoiceContext,
+      haulLength: state.haul,
     });
     showSavedIndicator();
   }, 400);
@@ -168,6 +169,7 @@ async function init() {
   document.getElementById('seatHeading').innerHTML = `Seat <span style="color:var(--accent);">${state.seat.seatId}</span> &middot; ${state.seat.classType} Class`;
 
   state.prefs = await getSeatPreferences(seatId);
+  state.haul = state.prefs.haulLength || 'shortHaul';
   renderPrefs();
 
   const haulSelect = document.getElementById('haulSelect');
@@ -175,6 +177,7 @@ async function init() {
   haulSelect.addEventListener('change', async (e) => {
     state.haul = e.target.value;
     await loadMenu();
+    scheduleSave();
   });
 
   document.getElementById('recommendBtn').addEventListener('click', onRecommendClick);

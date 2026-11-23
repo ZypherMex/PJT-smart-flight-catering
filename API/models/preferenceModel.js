@@ -41,6 +41,8 @@ function rowToApiShape(row) {
       checks: { allergies: [], intolerances: [], medicalConditions: [], other: [] },
       mealChoice: null,
       mealChoiceContext: null,
+      haulLength: null,
+      mealTime: null,
       updatedAt: null,
     };
   }
@@ -54,6 +56,8 @@ function rowToApiShape(row) {
     checks,
     mealChoice: row.meal_choice,
     mealChoiceContext: row.meal_choice_context,
+    haulLength: row.haul_length,
+    mealTime: row.meal_time,
     updatedAt: row.updated_at,
   };
 }
@@ -63,23 +67,42 @@ function getPreferences(seatId) {
   return rowToApiShape(row);
 }
 
-// Shared write path for a single seat's checkbox columns + meal choice —
+const EXTRA_FIELD_COLUMNS = {
+  mealChoice: 'meal_choice',
+  mealChoiceContext: 'meal_choice_context',
+  haulLength: 'haul_length',
+  mealTime: 'meal_time',
+};
+
+// Shared write path for a single seat's checkbox columns + meal/haul/time —
 // used by both the manual single-seat save and the bulk randomizer so the
-// insert/update SQL only lives in one place.
-function writePreferenceRow(seatId, columnValues, mealChoice, mealChoiceContext) {
+// insert/update SQL only lives in one place. Any `extra` field left
+// `undefined` is skipped (leaves the existing DB value untouched) rather
+// than being nulled out — different callers persist different subsets
+// (e.g. the menu-ordering page only ever touches haulLength, never mealTime).
+function writePreferenceRow(seatId, columnValues, extra = {}) {
   const existing = db.prepare('SELECT 1 FROM seat_preferences WHERE seat_id = ?').get(seatId);
   const columns = Object.keys(columnValues);
-  const placeholders = columns.map(() => '?').join(', ');
+
+  const extraColumns = [];
+  const extraValues = [];
+  for (const [field, column] of Object.entries(EXTRA_FIELD_COLUMNS)) {
+    if (extra[field] === undefined) continue;
+    extraColumns.push(column);
+    extraValues.push(extra[field] ?? null);
+  }
 
   if (existing) {
-    const setClause = columns.map((col) => `${col} = ?`).join(', ');
+    const setClause = [...columns, ...extraColumns].map((col) => `${col} = ?`).join(', ');
     db.prepare(
-      `UPDATE seat_preferences SET ${setClause}, meal_choice = ?, meal_choice_context = ?, updated_at = CURRENT_TIMESTAMP WHERE seat_id = ?`
-    ).run(...columns.map((col) => columnValues[col]), mealChoice ?? null, mealChoiceContext ?? null, seatId);
+      `UPDATE seat_preferences SET ${setClause}, updated_at = CURRENT_TIMESTAMP WHERE seat_id = ?`
+    ).run(...columns.map((col) => columnValues[col]), ...extraValues, seatId);
   } else {
+    const allColumns = [...columns, ...extraColumns];
+    const placeholders = allColumns.map(() => '?').join(', ');
     db.prepare(
-      `INSERT INTO seat_preferences (seat_id, ${columns.join(', ')}, meal_choice, meal_choice_context) VALUES (?, ${placeholders}, ?, ?)`
-    ).run(seatId, ...columns.map((col) => columnValues[col]), mealChoice ?? null, mealChoiceContext ?? null);
+      `INSERT INTO seat_preferences (seat_id, ${allColumns.join(', ')}) VALUES (?, ${placeholders})`
+    ).run(seatId, ...columns.map((col) => columnValues[col]), ...extraValues);
   }
 }
 
@@ -96,9 +119,15 @@ function checksToColumnValues(checks) {
 
 // body.checks = { allergies: ['Peanuts', ...], intolerances: [...], medicalConditions: [...], other: [...] }
 // body.mealChoice / body.mealChoiceContext = single-choice wine name or veg/nonVeg + its haul/time context.
+// body.haulLength / body.mealTime = the passenger's own flight haul length and meal time, shown to crew.
 function upsertPreferences(seatId, body) {
   const columnValues = checksToColumnValues(body.checks || {});
-  writePreferenceRow(seatId, columnValues, body.mealChoice, body.mealChoiceContext);
+  writePreferenceRow(seatId, columnValues, {
+    mealChoice: body.mealChoice,
+    mealChoiceContext: body.mealChoiceContext,
+    haulLength: body.haulLength,
+    mealTime: body.mealTime,
+  });
   return getPreferences(seatId);
 }
 
@@ -136,7 +165,7 @@ function randomizeAllPreferences(haul, time) {
       }
       const columnValues = checksToColumnValues(checks);
       const { mealChoice, mealChoiceContext } = randomMealChoiceFor(seat.classType, haul, time);
-      writePreferenceRow(seat.seatId, columnValues, mealChoice, mealChoiceContext);
+      writePreferenceRow(seat.seatId, columnValues, { mealChoice, mealChoiceContext, haulLength: haul, mealTime: time });
     }
   });
 
@@ -144,4 +173,11 @@ function randomizeAllPreferences(haul, time) {
   return seats.length;
 }
 
-module.exports = { getPreferences, upsertPreferences, randomizeAllPreferences, CHECKBOX_COLUMNS };
+module.exports = {
+  getPreferences,
+  upsertPreferences,
+  randomizeAllPreferences,
+  CHECKBOX_COLUMNS,
+  HAUL_LENGTHS,
+  TIME_WINDOWS,
+};

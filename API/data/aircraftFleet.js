@@ -10,7 +10,7 @@ const FLEET = [
     tagline: 'Our newest widebody — First, Business & Economy',
     totalSeats: 312,
     status: 'available',
-    href: 'a350.html',
+    href: 'a350.html?mode=crew',
   },
   {
     key: 'a380-800',

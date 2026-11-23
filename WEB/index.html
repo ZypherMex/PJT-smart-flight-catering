@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Smart Catering — Choose Your Aircraft</title>
+<title>Smart Catering — Welcome</title>
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -12,9 +12,7 @@
     <div class="topbar-inner">
       <div class="wordmark">fly<span>cater</span><span class="dot">.</span></div>
       <nav class="topbar-nav">
-        <a class="active" href="index.html">Fleet</a>
         <a href="menu.html">Dining</a>
-        <a href="#">Operations</a>
       </nav>
     </div>
   </header>
@@ -22,25 +20,43 @@
   <section class="hero">
     <div class="hero-inner">
       <div class="hero-eyebrow">Smart Flight Catering &middot; Fly Better</div>
-      <h1>Choose your<br>aircraft.</h1>
-      <p class="hero-sub">Pick an aircraft type to open its seat map and manage passenger dining, allergy and medical preferences.</p>
+      <h1>Who's flying<br>this screen?</h1>
+      <p class="hero-sub">Choose Cabin Crew to manage a flight's seat map, or Customer to pick your own seat and order your meal.</p>
     </div>
   </section>
 
   <main class="main-content">
     <section class="card fleet-card">
-      <div class="card-header">
-        <div class="legend">
-          <span><span class="sw-dot"></span>Available now</span>
-          <span><span class="sw-dot sw-dot-muted"></span>Coming soon</span>
-        </div>
-      </div>
-      <div class="fleet-grid" id="fleetGrid">
-        <div class="panel-placeholder">Loading fleet&hellip;</div>
+      <div class="fleet-grid">
+        <button type="button" class="aircraft-card role-card" id="customerCard">
+          <div class="aircraft-icon">&#128100;</div>
+          <div class="aircraft-name">Customer</div>
+          <p class="aircraft-tagline">Pick your seat, set your health &amp; dietary preferences, and order your meal.</p>
+          <div class="aircraft-meta"><span class="badge badge-live">Start here</span></div>
+        </button>
+        <button type="button" class="aircraft-card role-card" id="crewCard">
+          <div class="aircraft-icon">&#9992;</div>
+          <div class="aircraft-name">Cabin Crew</div>
+          <p class="aircraft-tagline">Select a flight and review what every passenger has ordered.</p>
+          <div class="aircraft-meta"><span class="badge badge-muted">Passkey required</span></div>
+        </button>
       </div>
     </section>
   </main>
 
-  <script type="module" src="js/home.js"></script>
+  <div class="modal-overlay" id="passkeyModal" hidden>
+    <div class="modal-box">
+      <h3>Cabin Crew Access</h3>
+      <p>Enter the 6-digit crew passkey to continue.</p>
+      <input type="password" inputmode="numeric" maxlength="6" class="modal-input" id="passkeyInput" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;">
+      <div class="modal-error" id="passkeyError" hidden>Incorrect passkey. Try again.</div>
+      <div class="modal-actions">
+        <button type="button" class="close-btn" id="passkeyCancel">Cancel</button>
+        <button type="button" class="randomize-btn modal-submit" id="passkeySubmit">Unlock</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/roleSelect.js"></script>
 </body>
 </html>

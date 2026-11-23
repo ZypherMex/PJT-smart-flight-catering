@@ -41,6 +41,14 @@ function validatePreferencesBody(body) {
     return '"mealChoiceContext" must be a string or null';
   }
 
+  if (body.haulLength !== undefined && body.haulLength !== null && !VALID_HAULS.includes(body.haulLength)) {
+    return `"haulLength" must be one of ${VALID_HAULS.join(', ')}, or null`;
+  }
+
+  if (body.mealTime !== undefined && body.mealTime !== null && !VALID_TIMES.includes(body.mealTime)) {
+    return `"mealTime" must be one of ${VALID_TIMES.join(', ')}, or null`;
+  }
+
   return null;
 }
 
