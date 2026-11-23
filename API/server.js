@@ -18,3 +18,5 @@ console.log(`Menu table ready (${menuItemCount} items).`);
 app.listen(PORT, () => {
   console.log(`Smart Flight Catering app running at http://localhost:${PORT}`);
 });
+
+//This is is a NGL I REALLY WANNA PUSH ITcomment i hope nothing breaks while it is at it.
