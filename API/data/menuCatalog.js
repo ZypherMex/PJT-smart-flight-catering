@@ -35,6 +35,20 @@ const DISH_PHOTOS = {
   'Tofu Poke Bowl': '/images/menu/tofu-poke-bowl.png',
   'Vegetable Paella': '/images/menu/vegetable-paella.png',
   Waffles: '/images/menu/waffles.png',
+  Antipasti: '/images/menu/antipasti.png',
+  'Barley Salad': '/images/menu/barley-salad.png',
+  Caviar: '/images/menu/caviar.png',
+  'Cheese Omelette': '/images/menu/cheese-omelette.png',
+  'Emirates Pizza': '/images/menu/emirates-pizza.png',
+  'Fine Luxury Chocolates': '/images/menu/fine-luxury-chocolates.png',
+  'Fruit Yoghurt': '/images/menu/fruit-yoghurt.png',
+  'Lamb and Rosemary Pie': '/images/menu/lamb-and-rosemary-pie.png',
+  'Maamoul with Chocolate': '/images/menu/maamoul-with-chocolate.png',
+  'Orange Frangipane Tart': '/images/menu/orange-frangipane-tart.png',
+  Salad: '/images/menu/salad.png',
+  'Seasonal Fruit': '/images/menu/seasonal-fruit.png',
+  'Fresh Seasonal Fruit': '/images/menu/fresh-seasonal-fruit.png',
+  'Vegetable Crêpes': '/images/menu/vegetable-crepes.png',
 };
 
 function item(name, description, icon, dietaryTag) {
@@ -146,6 +160,14 @@ const MENU_CATALOG = {
 
   Business: {
     shortHaul: [
+      {
+        section: 'Light Bites',
+        items: [
+          item('Tofu Poke Bowl', 'Sriracha tofu with barley salad, sautéed oyster mushrooms, carrots, cherry tomatoes, avocado, sesame seeds and soy chilli dressing', 'tofu', 'vegetarian'),
+          item('Stir-fried Vegetable Noodles', 'A light stir-fry of fresh vegetables and noodles', 'noodles', 'vegetarian'),
+          item('Lamb and Rosemary Pie', 'A warming savoury pie with lamb and fresh rosemary', 'pie'),
+        ],
+      },
       {
         section: 'Champagne & Wine',
         items: [

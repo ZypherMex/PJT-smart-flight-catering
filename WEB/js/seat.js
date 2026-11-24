@@ -75,6 +75,24 @@ function onCheckboxChange(e) {
   scheduleSave();
 }
 
+function renderDishSelectCard(item) {
+  const photo = item.imageUrl
+    ? `<img src="${item.imageUrl}" alt="${item.name}">`
+    : `<div class="dish-photo-placeholder"><span>&#127860;</span></div>`;
+  const checked = state.selectedMealIds.has(item.id) ? 'checked' : '';
+
+  return `<label class="dish-card dish-card-select">
+    <div class="dish-photo">${photo}</div>
+    <div class="dish-body">
+      <div class="dish-name">
+        <input type="checkbox" data-meal-id="${item.id}" ${checked}>
+        <span>${item.name}</span>
+      </div>
+      ${item.description ? `<p class="dish-desc">${item.description}</p>` : ''}
+    </div>
+  </label>`;
+}
+
 function renderMenu(sections) {
   const container = document.getElementById('menuContent');
   if (!sections.length) {
@@ -84,14 +102,9 @@ function renderMenu(sections) {
   container.innerHTML = sections
     .map(
       (section) => `
-    <div class="pref-group" style="margin-bottom:14px;">
-      <h4>${section.sectionName}</h4>
-      ${section.items
-        .map(
-          (item) => `<label class="chk"><input type="checkbox" data-meal-id="${item.id}" ${state.selectedMealIds.has(item.id) ? 'checked' : ''}>
-            <span>${item.name}${item.description ? ` <span style="color:var(--muted);font-weight:400;">&mdash; ${item.description}</span>` : ''}</span></label>`
-        )
-        .join('')}
+    <div class="menu-section" style="margin-bottom:20px;">
+      <h4 class="dish-select-section-title">${section.sectionName}</h4>
+      <div class="dish-select-grid">${section.items.map(renderDishSelectCard).join('')}</div>
     </div>`
     )
     .join('');

@@ -274,9 +274,18 @@ body.mode-customer .hero-controls{display:none;}
 
 /* ---------- Role selector (landing page) ---------- */
 .role-card{
-  all:unset;display:block;cursor:pointer;width:100%;box-sizing:border-box;
-  text-align:left;font-family:inherit;
+  width:100%;box-sizing:border-box;text-align:left;font-family:inherit;cursor:pointer;
 }
+.role-icon-badge{
+  width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+  margin-bottom:14px;
+}
+.role-icon-badge svg{width:24px;height:24px;}
+.role-icon-customer{background:var(--accent-tint);color:var(--accent);}
+.role-icon-crew{background:var(--emirates-navy);color:#fff;}
+.role-card .aircraft-meta{justify-content:space-between;}
+.role-card-arrow{color:var(--muted);font-size:16px;opacity:0;transition:opacity .15s ease, transform .15s ease;transform:translateX(-4px);}
+.role-card:hover .role-card-arrow{opacity:1;transform:translateX(0);}
 .modal-overlay{
   position:fixed;inset:0;background:rgba(20,16,10,.55);
   display:flex;align-items:center;justify-content:center;z-index:50;
@@ -344,6 +353,14 @@ body.mode-customer .hero-controls{display:none;}
 }
 .dish-card .dish-badge{font-size:9.5px;padding:2px 9px;}
 .dish-card .dish-desc{font-size:12.5px;color:var(--muted);line-height:1.45;margin:0;}
+
+/* ---------- Seat page: tick-to-order menu with photos ---------- */
+.dish-select-section-title{margin:0 0 12px;font-size:12.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:700;}
+.dish-select-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;}
+.dish-card-select{display:block;cursor:pointer;}
+.dish-card-select .dish-name{display:flex;align-items:center;gap:9px;}
+.dish-card-select .dish-name input{width:16px;height:16px;cursor:pointer;accent-color:var(--emirates-red);flex:0 0 auto;}
+.dish-card-select:has(input:checked){outline:2px solid var(--emirates-red);outline-offset:1px;}
 
 @media (max-width: 760px){
   .hero{flex-direction:column;align-items:flex-start;}
