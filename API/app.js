@@ -10,6 +10,7 @@ const recommendationRoutes = require('./routes/recommendationRoutes');
 const crewRoutes = require('./routes/crewRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const healthConditionRoutes = require('./routes/healthConditionRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
@@ -20,6 +21,7 @@ app.use(express.static(path.join(__dirname, '..', 'WEB')));
 app.use('/api', crewRoutes);
 app.use('/api', healthConditionRoutes);
 app.use('/api', orderRoutes);
+app.use('/api', adminRoutes);
 app.use('/api', seatRoutes);
 app.use('/api', preferenceRoutes);
 app.use('/api', diningRoutes);

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Smart Catering</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="wordmark" href="index.html">fly<span>cater</span><span class="dot">.</span></a>
+      <nav class="topbar-nav"></nav>
+    </div>
+  </header>
+
+  <section class="ad-header">
+    <div class="ad-header-inner">
+      <div class="hero-eyebrow">Administration</div>
+      <h1>Meals &amp; health rules</h1>
+    </div>
+  </section>
+
+  <main class="ad-main">
+
+    <div class="ad-tabs" role="tablist">
+      <button type="button" class="ad-tab is-active" role="tab" data-tab="meals">Meals</button>
+      <button type="button" class="ad-tab" role="tab" data-tab="rules">Health rules</button>
+    </div>
+
+    <!-- ===== Meals ===== -->
+    <section id="tab-meals">
+      <div class="ad-toolbar">
+        <div class="ad-tool ad-tool-grow">
+          <label for="mealSearch">Search</label>
+          <input id="mealSearch" type="search" placeholder="Meal name" autocomplete="off">
+        </div>
+        <div class="ad-tool">
+          <label for="mealClassFilter">Cabin</label>
+          <select id="mealClassFilter"><option value="">All</option></select>
+        </div>
+        <div class="ad-tool">
+          <label for="mealHaulFilter">Flight</label>
+          <select id="mealHaulFilter"><option value="">All</option></select>
+        </div>
+        <div class="ad-tool">
+          <label for="mealCategoryFilter">Category</label>
+          <select id="mealCategoryFilter"><option value="">All</option></select>
+        </div>
+        <label class="ad-tool ad-tool-check"><input id="mealReviewFilter" type="checkbox"><span>Needs tag review</span></label>
+        <button type="button" class="ad-btn ad-btn-primary" id="addMealBtn">+ Add meal</button>
+      </div>
+      <div class="ad-count" id="mealCount"></div>
+      <div class="ad-list" id="mealList"><div class="ad-empty">Loading meals&hellip;</div></div>
+    </section>
+
+    <!-- ===== Health rules ===== -->
+    <section id="tab-rules" hidden>
+      <div class="ad-toolbar">
+        <p class="ad-intro">Each health condition blocks dishes that carry certain tags. Passengers who pick the condition can't order those dishes.</p>
+        <button type="button" class="ad-btn ad-btn-primary" id="addConditionBtn">+ Add condition</button>
+      </div>
+      <div id="conditionList"><div class="ad-empty">Loading&hellip;</div></div>
+
+      <h2 class="ad-h2">Tags</h2>
+      <p class="ad-intro">Tags describe what a dish contains. Add your own (for example "Shellfish"), then tick it on the dishes and on the conditions that should block it.</p>
+      <form id="tagForm" class="ad-tagform">
+        <input id="tagLabel" type="text" maxlength="60" placeholder="New tag, e.g. Shellfish" aria-label="New tag name">
+        <select id="tagKind" aria-label="Tag type"><option value="ingredient">Ingredient</option><option value="nutrition">Nutrition (high in)</option></select>
+        <button type="submit" class="ad-btn">Add tag</button>
+      </form>
+      <div id="tagList"></div>
+    </section>
+
+  </main>
+
+  <div class="ad-modal-overlay" id="modal" hidden>
+    <div class="ad-modal" id="modalBox" role="dialog" aria-modal="true"></div>
+  </div>
+  <div class="ad-toast" id="toast" role="status" hidden></div>
+
+  <script type="module" src="js/admin.js"></script>
+</body>
+</html>

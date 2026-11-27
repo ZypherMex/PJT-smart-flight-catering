@@ -370,9 +370,11 @@ body.mode-customer .hero-controls{display:none;}
 
 @media (max-width: 639px){
   /* crew pages carry up to six top-bar links; keep them on one line on a phone */
-  .topbar-inner{padding:0 14px;}
-  .topbar-nav{gap:14px;}
-  .topbar-nav a{font-size:12.5px;white-space:nowrap;}
+  .topbar-inner{padding:0 12px;gap:10px;}
+  .wordmark{font-size:16px;flex:0 0 auto;}
+  .topbar-nav{gap:11px;min-width:0;overflow-x:auto;scrollbar-width:none;}
+  .topbar-nav::-webkit-scrollbar{display:none;}
+  .topbar-nav a{font-size:12px;white-space:nowrap;flex:0 0 auto;}
 }
 
 @media (max-width: 760px){

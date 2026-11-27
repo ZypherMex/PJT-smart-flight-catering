@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 const db = require('../db/connection');
 const HttpError = require('../utils/HttpError');
+const { thumbFor } = require('../utils/images');
 const { getSeat } = require('./seatModel');
 const { listConditions } = require('./healthConditionModel');
 const { getConflicts } = require('./compatibilityModel');
@@ -63,7 +64,7 @@ function buildOrders(rows) {
       id: item.id,
       name: item.name,
       imageUrl: item.imageUrl,
-      thumbUrl: item.imageUrl,
+      thumbUrl: thumbFor(item.imageUrl),
     };
   }
   for (const condition of conditions) {
@@ -158,7 +159,7 @@ function getPortalMenu(seatId, haulLength, conditionIds = [], excludeOrderId = n
         description: row.description,
         dietaryTag: row.dietaryTag,
         imageUrl: row.imageUrl,
-        thumbUrl: row.imageUrl,
+        thumbUrl: thumbFor(row.imageUrl),
         soldOut: isSoldOut(row, row.used),
         remaining: row.stockQty === null ? null : Math.max(0, row.stockQty - row.used),
         conflicts: getConflicts(row.id, conditionIds),
