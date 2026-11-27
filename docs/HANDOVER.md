@@ -405,6 +405,8 @@ Limits and risks:
 | `AI_RATE_LIMIT` | `6` | Suggestions per IP per minute |
 | `NODE_ENV` | not set | Recommended `production` (Express optimisations) |
 
+Important for moving to another computer: on the original developer's laptop the AI settings (`ANTHROPIC_AUTH_TOKEN`, `ANTHROPIC_BASE_URL`, `ANTHROPIC_MODEL`, and `NODE_TLS_REJECT_UNAUTHORIZED`) are also present in the environment of programs started from the developer's terminal (whether set by Windows or by a tool is not known), so a fresh clone started there reports AI ON even with no `.env` (verified). They are **not** in the repository. A different computer starts with the AI off until these are supplied in its `.env` (and, on a network with an SSL-inspection proxy, `ANTHROPIC_ALLOW_INSECURE_TLS=true` or `NODE_EXTRA_CA_CERTS`). The code accepts either `ANTHROPIC_API_KEY` or `ANTHROPIC_AUTH_TOKEN`.
+
 No `requirements.txt` exists or is needed; dependencies are in `package.json` / `package-lock.json`.
 
 ---

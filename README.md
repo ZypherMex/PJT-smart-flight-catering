@@ -16,7 +16,7 @@ Open http://localhost:3000. The first start creates the database and loads the m
 
 Then open the new `.env` file and fill in two things before real use:
 
-1. **`ANTHROPIC_API_KEY`**: your AI key. It powers "Suggest meals for me" on the order page. Every install is expected to have one. Ask whoever manages your AI access, and if your organisation uses an internal AI gateway, also set `ANTHROPIC_BASE_URL` (see the comments in `.env.example`). The `.env` file stays on this computer and is never uploaded to GitHub, so never paste the key into a chat, email or commit.
+1. **`ANTHROPIC_API_KEY`** (or **`ANTHROPIC_AUTH_TOKEN`** if your gateway issues a token): your AI key. If these are already set in your computer's environment (some work laptops have them preconfigured), the server picks them up automatically and you can skip this; a new computer usually needs them in `.env`. It powers "Suggest meals for me" on the order page. Every install is expected to have one. Ask whoever manages your AI access, and if your organisation uses an internal AI gateway, also set `ANTHROPIC_BASE_URL` (see the comments in `.env.example`). The `.env` file stays on this computer and is never uploaded to GitHub, so never paste the key into a chat, email or commit.
 2. **`CREW_PASSKEY`**: the passkey for crew and admin. The default is `123490`; change it.
 
 When the server starts, check the first lines of output. You should see `AI meal suggestions: ON`. If you see **AI KEY MISSING** instead, the system still works (ordering, the crew board, admin and reports are unaffected). Passengers just see "Meal suggestions are not available on this flight" instead of the suggestion button, and the admin page shows a banner reminding staff how to fix it. Add the key and restart to switch it on.
@@ -72,7 +72,7 @@ The system has been tested with simulated phones, a 300-passenger load test and 
 | `MAX_CONDITIONS` | `5` | Most health conditions a passenger may declare |
 | `ORDER_RATE_LIMIT` | `60` | Orders/menu changes per device per minute |
 | `AI_RATE_LIMIT` | `6` | Meal suggestions per device per minute |
-| `ANTHROPIC_API_KEY` | (none) | **Expected.** Your AI key for meal suggestions. The system runs without it, with suggestions switched off |
+| `ANTHROPIC_API_KEY` (or `ANTHROPIC_AUTH_TOKEN`) | (none) | **Expected.** Your AI key, or the token your AI gateway issues, for meal suggestions. Either one works. The system runs without it, with suggestions switched off |
 | `ANTHROPIC_BASE_URL`, `ANTHROPIC_MODEL` | | Only if you use an internal AI gateway (see `.env.example`) |
 
 ## Data and backups
