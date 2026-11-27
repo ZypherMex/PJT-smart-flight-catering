@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Order your meal — Smart Catering</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/order.css">
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="wordmark" href="index.html">fly<span>cater</span><span class="dot">.</span></a>
+      <span class="op-live" id="liveIndicator">Connecting&hellip;</span>
+    </div>
+  </header>
+
+  <section class="op-header">
+    <div class="op-header-inner">
+      <div class="hero-eyebrow">Inflight dining</div>
+      <h1>Order your meal</h1>
+      <p>Pick at most one dish from each category, tell us about any health conditions, and the cabin crew will bring it to your seat.</p>
+    </div>
+  </section>
+
+  <main class="op-main">
+
+    <section class="op-card op-status" id="statusCard" aria-live="polite" hidden></section>
+
+    <div class="op-notices" id="notices" aria-live="polite"></div>
+
+    <section class="op-card" id="seatCard">
+      <div id="seatForm">
+        <h2>Your seat</h2>
+        <p class="op-sub">Enter the seat number printed above your seat, for example <strong>12A</strong>.</p>
+        <div class="op-field">
+          <label for="seatInput">Seat number</label>
+          <input class="op-input" id="seatInput" type="text" inputmode="text" autocomplete="off" autocapitalize="characters" maxlength="4" placeholder="12A">
+        </div>
+        <div class="op-field">
+          <label for="nameInput">Name <span class="op-optional">(optional)</span></label>
+          <input class="op-input" id="nameInput" type="text" autocomplete="given-name" maxlength="60" placeholder="So the crew can greet you">
+        </div>
+        <div class="op-error" id="seatError" hidden></div>
+        <button type="button" class="op-btn op-btn-block" id="seatContinue">Continue</button>
+      </div>
+      <div class="op-seat-summary" id="seatSummary" hidden></div>
+    </section>
+
+    <div id="detailSections" hidden>
+
+      <section class="op-card" id="flightCard">
+        <h2>Your flight</h2>
+        <p class="op-sub">The menu changes with the length of your flight.</p>
+        <div class="op-segmented" id="haulControl" role="group" aria-label="Flight length">
+          <button type="button" data-haul="shortHaul">Short haul</button>
+          <button type="button" data-haul="mediumHaul">Medium haul</button>
+          <button type="button" data-haul="longHaul">Long haul</button>
+        </div>
+      </section>
+
+      <section class="op-card" id="conditionsCard">
+        <h2>Health conditions</h2>
+        <p class="op-sub">Optional. Meals that don't suit your conditions are greyed out with the reason. <span id="conditionCounter"></span></p>
+        <div id="conditionChips"></div>
+        <p class="op-fineprint">This is a guide only. Always tell the cabin crew about severe allergies.</p>
+      </section>
+
+      <section id="menuSection">
+        <h2 class="op-section-title">Choose your meals</h2>
+        <div id="menuCategories"><div class="panel-placeholder">Loading menu&hellip;</div></div>
+      </section>
+
+      <p class="op-fineprint op-alt-link">Prefer to pick your seat on the aircraft map? <a href="a350.html">Open the seat map</a></p>
+    </div>
+
+  </main>
+
+  <div class="op-actionbar" id="actionBar" hidden>
+    <div class="op-actionbar-inner">
+      <div class="op-action-summary" id="actionSummary"></div>
+      <button type="button" class="op-btn" id="placeOrderBtn">Place Order</button>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script type="module" src="js/order.js"></script>
+</body>
+</html>

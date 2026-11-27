@@ -29,7 +29,7 @@ async function trySubmit() {
 }
 
 document.getElementById('customerCard').addEventListener('click', () => {
-  window.location.href = 'a350.html';
+  window.location.href = 'order.html';
 });
 
 document.getElementById('crewCard').addEventListener('click', openModal);

@@ -153,6 +153,7 @@ function getPortalMenu(seatId, haulLength, conditionIds = [], excludeOrderId = n
       .filter((row) => row.category === category)
       .map((row) => ({
         id: row.id,
+        category: row.category,
         name: row.name,
         description: row.description,
         dietaryTag: row.dietaryTag,
