@@ -140,3 +140,8 @@
   .ad-modal{padding:16px;}
   .ad-modal-actions .ad-btn{flex:1 1 auto;}
 }
+
+/* notice shown when the AI key is missing */
+.ad-banner{background:var(--warn-bg);color:var(--warn-fg);border:1px solid var(--warn-border);border-radius:14px;padding:14px 18px;margin-bottom:16px;font-size:13.5px;line-height:1.55;}
+.ad-banner strong{display:block;margin-bottom:2px;font-size:14.5px;}
+.ad-banner code{background:rgba(128,128,128,.18);padding:1px 6px;border-radius:5px;font-size:12.5px;}

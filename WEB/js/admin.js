@@ -43,6 +43,13 @@ async function init() {
     return;
   }
 
+  fetch('/api/features')
+    .then((res) => res.json())
+    .then((features) => {
+      document.getElementById('aiBanner').hidden = !!features.aiSuggestions;
+    })
+    .catch(() => {});
+
   document.querySelector('.ad-tabs').addEventListener('click', (event) => {
     const tab = event.target.closest('.ad-tab');
     if (tab) showTab(tab.dataset.tab);

@@ -63,6 +63,7 @@ const state = {
   notices: [],
   busy: false,
   ai: { loading: false, result: null, error: null },
+  aiAvailable: null, // null until the server says; false when no AI key is set up
 };
 
 const isLocked = () => !!state.order && state.order.status !== 'pending';
@@ -167,6 +168,14 @@ function renderAi() {
   const out = $('aiResult');
   const { loading, result, error } = state.ai;
 
+  // No AI key on the server: say so plainly instead of offering a button that cannot work.
+  if (state.aiAvailable === false) {
+    button.hidden = true;
+    out.innerHTML = '<p class="op-empty">Meal suggestions are not available on this flight. Please choose from the menu below.</p>';
+    return;
+  }
+  button.hidden = false;
+
   button.disabled = loading || isLocked();
   button.textContent = loading ? 'Thinking…' : result ? 'Suggest again' : 'Suggest meals for me';
 
@@ -211,6 +220,7 @@ async function onAiClick() {
     });
     state.ai = { loading: false, result, error: null };
   } catch (err) {
+    if (err instanceof ApiError && err.body && err.body.code === 'ai_not_configured') state.aiAvailable = false;
     state.ai = { loading: false, result: null, error: friendlyError(err) };
   }
   renderAi();
@@ -239,8 +249,9 @@ function mealCard(item) {
     note = `<span class="op-meal-note op-note-low">Only ${item.remaining} left</span>`;
   }
 
-  const photo = item.thumbUrl
-    ? `<img src="${escapeHtml(item.thumbUrl)}" alt="" loading="lazy" decoding="async">`
+  // The cards are large, so they use the full 640px photo. The 96px thumbnail is only for small lists.
+  const photo = item.imageUrl
+    ? `<img src="${escapeHtml(item.imageUrl)}" alt="" loading="lazy" decoding="async">`
     : '<span class="op-meal-placeholder">&#127860;</span>';
   const tag = item.dietaryTag === 'vegetarian' ? '<span class="badge op-meal-badge">Vegetarian</span>' : '';
 
@@ -707,6 +718,13 @@ async function init() {
   }
 
   connectSocket();
+  fetch('/api/features')
+    .then((res) => res.json())
+    .then((features) => {
+      state.aiAvailable = !!features.aiSuggestions;
+      renderAi();
+    })
+    .catch(() => {}); // unknown: leave the button, the server will answer if it is tried
   renderAll();
 
   const params = new URLSearchParams(window.location.search);

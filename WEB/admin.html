@@ -27,6 +27,12 @@
 
   <main class="ad-main">
 
+    <div class="ad-banner" id="aiBanner" role="status" hidden>
+      <strong>AI meal suggestions are switched off.</strong>
+      No AI key is set on this server. Ordering, the crew board and reports all work normally, but passengers will see a note instead of the suggestion button.
+      To turn it on, add <code>ANTHROPIC_API_KEY=...</code> to the <code>.env</code> file and restart the server.
+    </div>
+
     <div class="ad-tabs" role="tablist">
       <button type="button" class="ad-tab is-active" role="tab" data-tab="meals">Meals</button>
       <button type="button" class="ad-tab" role="tab" data-tab="rules">Health rules</button>

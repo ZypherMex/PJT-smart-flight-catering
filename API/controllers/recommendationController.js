@@ -3,11 +3,15 @@ const { seatExists } = require('../models/seatModel');
 const { resolveConditions } = require('../models/healthConditionModel');
 const { buildRecommendationContext } = require('../models/recommendationModel');
 const { getMealRecommendation } = require('../services/claudeClient');
+const { isAiConfigured } = require('../services/aiConfig');
 
 const VALID_HAUL_LENGTHS = ['shortHaul', 'mediumHaul', 'longHaul'];
 
 // Body: { seatNumber, haulType, conditions: [conditionId...], selectedMeals?: [mealId...] }
 async function recommendMealHandler(req, res) {
+  if (!isAiConfigured()) {
+    throw new HttpError(503, 'Meal suggestions are not set up on this server. You can still choose from the menu.', { code: 'ai_not_configured' });
+  }
   const { seatNumber, haulType, conditions, selectedMeals } = req.body || {};
 
   if (typeof seatNumber !== 'string' || !seatNumber) throw new HttpError(400, '"seatNumber" is required');

@@ -4,6 +4,7 @@ const http = require('http');
 const app = require('./app');
 const { initSocket } = require('./realtime/socket');
 const { getAccessUrls } = require('./services/networkService');
+const { isAiConfigured, describeAi } = require('./services/aiConfig');
 const { migrateSeatPreferencesColumns, seedSeatsIfEmpty, seedMenuIfEmpty, syncMenuImages } = require('./db/seed');
 const {
   migrateMenuColumns,
@@ -18,8 +19,14 @@ const {
 
 const PORT = process.env.PORT || 3000;
 
-if (!process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_API_KEY === 'your-key-here') {
-  console.warn('ANTHROPIC_API_KEY is not set — /api/meal/recommend will fail until .env is configured.');
+if (isAiConfigured()) {
+  console.log(`AI meal suggestions: ON (${describeAi()})`);
+} else {
+  console.warn('');
+  console.warn('  *** AI KEY MISSING: meal suggestions are switched OFF ***');
+  console.warn('  Ordering, the crew board, admin and reports all work normally.');
+  console.warn('  To turn suggestions on: put your key in the .env file as ANTHROPIC_API_KEY=... and restart.');
+  console.warn('');
 }
 
 migrateSeatPreferencesColumns();
