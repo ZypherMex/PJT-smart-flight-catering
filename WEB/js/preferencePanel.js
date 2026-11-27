@@ -34,7 +34,8 @@ function radioRow(nameAttr, labelPrefix, dish, checked, value) {
 }
 
 function renderCheckboxGroups(prefGroups, checks) {
-  return `<div class="pref-groups">${GROUP_LABELS.map(([groupKey, groupLabel]) => {
+  return `<p class="condition-counter" id="conditionCounter"></p>
+  <div class="pref-groups">${GROUP_LABELS.map(([groupKey, groupLabel]) => {
     const items = prefGroups[groupKey] || [];
     const checkedList = checks[groupKey] || [];
     const boxes = items
@@ -155,6 +156,7 @@ function render() {
   container.querySelectorAll('input[name="mealChoice"]').forEach((input) => {
     input.addEventListener('change', onMealChoiceChange);
   });
+  updateConditionCap();
   document.getElementById('panelHaulSelect').addEventListener('change', (e) => {
     currentSeatState.haul = e.target.value;
     render();
@@ -165,6 +167,20 @@ function render() {
     render();
     scheduleSave();
   });
+}
+
+// Once the passenger has ticked the maximum number of conditions, the rest are
+// disabled (they can still untick to swap). The server enforces the same cap.
+function updateConditionCap() {
+  const max = currentSeatState.diningMatrix.maxConditions;
+  const boxes = [...document.querySelectorAll('#panel [data-pref-group]')];
+  const count = boxes.filter((box) => box.checked).length;
+  boxes.forEach((box) => {
+    box.disabled = !box.checked && count >= max;
+    box.closest('.chk').classList.toggle('chk-disabled', box.disabled);
+  });
+  const counter = document.getElementById('conditionCounter');
+  if (counter) counter.textContent = `${count} / ${max} health conditions selected`;
 }
 
 function showSavedIndicator() {
@@ -200,6 +216,7 @@ function onCheckboxChange(e) {
   const idx = checks[group].indexOf(value);
   if (e.target.checked && idx === -1) checks[group].push(value);
   else if (!e.target.checked && idx !== -1) checks[group].splice(idx, 1);
+  updateConditionCap();
   scheduleSave();
 }
 

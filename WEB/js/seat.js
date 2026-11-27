@@ -1,4 +1,4 @@
-import { getSeatPreferences, putSeatPreferences } from './api.js';
+import { getSeatPreferences, putSeatPreferences, getDiningMatrix } from './api.js';
 import { getMenu } from './menuApi.js';
 import { getSeat, recommendMeal } from './recommendApi.js';
 
@@ -8,17 +8,17 @@ const GROUP_LABELS = [
   ['medicalConditions', 'Medical conditions'],
   ['other', 'Other'],
 ];
-const PREFERENCE_GROUPS = {
-  allergies: ['Peanuts', 'Eggs', 'Milk / dairy', 'Sesame', 'Soy'],
-  intolerances: ['Lactose / Gluten intolerance'],
-  medicalConditions: ['Diabetes', 'High blood pressure', 'High cholesterol', 'Heart disease', 'Kidney disease'],
-  other: ['Vegetarian / vegan', 'Halal'],
-};
-
 const params = new URLSearchParams(window.location.search);
 const seatId = params.get('seat');
 
-const state = { haul: 'shortHaul', prefs: null, selectedMealIds: new Set(), seat: null };
+const state = {
+  haul: 'shortHaul',
+  prefs: null,
+  selectedMealIds: new Set(),
+  seat: null,
+  prefGroups: {},
+  maxConditions: 5,
+};
 let saveTimer = null;
 
 function escapeAttr(s) {
@@ -27,8 +27,9 @@ function escapeAttr(s) {
 
 function renderPrefs() {
   const container = document.getElementById('prefsContent');
-  container.innerHTML = `<div class="pref-groups">${GROUP_LABELS.map(([groupKey, groupLabel]) => {
-    const items = PREFERENCE_GROUPS[groupKey];
+  container.innerHTML = `<p class="condition-counter" id="conditionCounter"></p>
+  <div class="pref-groups">${GROUP_LABELS.map(([groupKey, groupLabel]) => {
+    const items = state.prefGroups[groupKey] || [];
     const checkedList = state.prefs.checks[groupKey] || [];
     const boxes = items
       .map((item) => {
@@ -42,6 +43,20 @@ function renderPrefs() {
   container.querySelectorAll('[data-pref-group]').forEach((input) => {
     input.addEventListener('change', onCheckboxChange);
   });
+  updateConditionCap();
+}
+
+// Once the maximum number of conditions is ticked the rest are disabled (they
+// can still untick to swap). The server enforces the same cap.
+function updateConditionCap() {
+  const boxes = [...document.querySelectorAll('#prefsContent [data-pref-group]')];
+  const count = boxes.filter((box) => box.checked).length;
+  boxes.forEach((box) => {
+    box.disabled = !box.checked && count >= state.maxConditions;
+    box.closest('.chk').classList.toggle('chk-disabled', box.disabled);
+  });
+  const counter = document.getElementById('conditionCounter');
+  if (counter) counter.textContent = `${count} / ${state.maxConditions} health conditions selected`;
 }
 
 function showSavedIndicator() {
@@ -72,6 +87,7 @@ function onCheckboxChange(e) {
   const idx = checks[group].indexOf(value);
   if (e.target.checked && idx === -1) checks[group].push(value);
   else if (!e.target.checked && idx !== -1) checks[group].splice(idx, 1);
+  updateConditionCap();
   scheduleSave();
 }
 
@@ -181,7 +197,10 @@ async function init() {
 
   document.getElementById('seatHeading').innerHTML = `Seat <span style="color:var(--accent);">${state.seat.seatId}</span> &middot; ${state.seat.classType} Class`;
 
-  state.prefs = await getSeatPreferences(seatId);
+  const [prefs, diningMatrix] = await Promise.all([getSeatPreferences(seatId), getDiningMatrix()]);
+  state.prefs = prefs;
+  state.prefGroups = diningMatrix.preferenceGroups;
+  state.maxConditions = diningMatrix.maxConditions;
   state.haul = state.prefs.haulLength || 'shortHaul';
   renderPrefs();
 

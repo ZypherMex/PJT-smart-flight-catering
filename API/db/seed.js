@@ -79,8 +79,10 @@ function seedMenuIfEmpty() {
 
 // Runs every startup (not just on first seed) so a photo added to
 // menuCatalog.js later shows up immediately, without wiping the menu table.
+// Only fills dishes that have no photo yet, so images uploaded or changed
+// through the admin area are never overwritten.
 function syncMenuImages() {
-  const update = db.prepare('UPDATE menu_items SET image_url = ? WHERE name = ? AND image_url IS NOT ?');
+  const update = db.prepare('UPDATE menu_items SET image_url = ? WHERE name = ? AND image_url IS NULL');
   let updated = 0;
 
   const updateAll = db.transaction(() => {
@@ -89,7 +91,7 @@ function syncMenuImages() {
         for (const section of sections) {
           for (const dish of section.items) {
             if (!dish.imageUrl) continue;
-            const { changes } = update.run(dish.imageUrl, dish.name, dish.imageUrl);
+            const { changes } = update.run(dish.imageUrl, dish.name);
             updated += changes;
           }
         }

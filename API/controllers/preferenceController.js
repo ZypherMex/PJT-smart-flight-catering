@@ -1,7 +1,8 @@
 const { seatExists } = require('../models/seatModel');
-const { getPreferences, upsertPreferences, randomizeAllPreferences, CHECKBOX_COLUMNS } = require('../models/preferenceModel');
+const { getPreferences, upsertPreferences, randomizeAllPreferences } = require('../models/preferenceModel');
+const { getPreferenceGroups } = require('../models/healthConditionModel');
+const { MAX_CONDITIONS } = require('../config');
 
-const CHECK_GROUPS = Object.keys(CHECKBOX_COLUMNS);
 const VALID_HAULS = ['shortHaul', 'mediumHaul', 'longHaul'];
 const VALID_TIMES = ['breakfast', 'lunchDinner', 'eveningSnack'];
 
@@ -14,18 +15,23 @@ function validatePreferencesBody(body) {
     if (typeof body.checks !== 'object' || body.checks === null || Array.isArray(body.checks)) {
       return '"checks" must be an object';
     }
+    const groups = getPreferenceGroups();
+    const selected = new Set();
     for (const [groupKey, items] of Object.entries(body.checks)) {
-      if (!CHECK_GROUPS.includes(groupKey)) {
+      if (!Object.prototype.hasOwnProperty.call(groups, groupKey)) {
         return `Unknown checks group: ${groupKey}`;
       }
       if (!Array.isArray(items) || !items.every((item) => typeof item === 'string')) {
         return `"checks.${groupKey}" must be an array of strings`;
       }
-      const validLabels = Object.keys(CHECKBOX_COLUMNS[groupKey]);
-      const unknown = items.find((item) => !validLabels.includes(item));
+      const unknown = items.find((item) => !groups[groupKey].includes(item));
       if (unknown) {
         return `Unknown ${groupKey} item: ${unknown}`;
       }
+      items.forEach((item) => selected.add(item));
+    }
+    if (selected.size > MAX_CONDITIONS) {
+      return `You can select at most ${MAX_CONDITIONS} health conditions`;
     }
   }
 

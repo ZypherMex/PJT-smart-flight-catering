@@ -203,6 +203,9 @@ body.mode-customer .hero-controls{display:none;}
 .pref-group h4{margin:0 0 8px;font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:700;}
 .chk{display:flex;gap:9px;align-items:center;font-size:13.5px;padding:5px 0;cursor:pointer;color:var(--text);}
 .chk input{width:16px;height:16px;cursor:pointer;accent-color:var(--emirates-red);}
+.chk-disabled{opacity:.45;cursor:not-allowed;}
+.chk-disabled input{cursor:not-allowed;}
+.condition-counter{margin:0 0 10px;font-size:12px;font-weight:600;color:var(--muted);}
 
 .dining-section{background:#fafaf6;border:1px solid var(--border-soft);border-radius:14px;padding:18px 20px 22px;margin-bottom:20px;}
 .dining-section h3{margin:0 0 4px;font-size:15.5px;font-weight:700;}

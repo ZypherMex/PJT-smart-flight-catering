@@ -140,11 +140,4 @@ const DINING = {
   },
 };
 
-const PREFERENCE_GROUPS = {
-  allergies: ['Peanuts', 'Eggs', 'Milk / dairy', 'Sesame', 'Soy'],
-  intolerances: ['Lactose / Gluten intolerance'],
-  medicalConditions: ['Diabetes', 'High blood pressure', 'High cholesterol', 'Heart disease', 'Kidney disease'],
-  other: ['Vegetarian / vegan', 'Halal'],
-};
-
-module.exports = { DINING, PREFERENCE_GROUPS };
+module.exports = { DINING };

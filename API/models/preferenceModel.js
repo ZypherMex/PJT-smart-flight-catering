@@ -1,70 +1,42 @@
 const db = require('../db/connection');
 const { getAllSeatsWithPreferenceFlag } = require('./seatModel');
 const { DINING } = require('../data/diningMatrix');
+const { GROUP_KEYS, listConditions, getLabelToIdMap } = require('./healthConditionModel');
+const { MAX_CONDITIONS } = require('../config');
 
 const HAUL_LENGTHS = ['shortHaul', 'mediumHaul', 'longHaul'];
 const TIME_WINDOWS = ['breakfast', 'lunchDinner', 'eveningSnack'];
 
-// Maps each checkbox's (group, label) to its DB column — the single place
-// that translates the frontend's human-readable preference items into schema columns.
-const CHECKBOX_COLUMNS = {
-  allergies: {
-    Peanuts: 'peanut_allergy',
-    Eggs: 'egg_allergy',
-    'Milk / dairy': 'milk_allergy',
-    Sesame: 'sesame_allergy',
-    Soy: 'soy_allergy',
-  },
-  intolerances: {
-    'Lactose / Gluten intolerance': 'lactose_gluten_intolerance',
-  },
-  medicalConditions: {
-    Diabetes: 'diabetes',
-    'High blood pressure': 'high_blood_pressure',
-    'High cholesterol': 'high_cholesterol',
-    'Heart disease': 'heart_disease',
-    'Kidney disease': 'kidney_disease',
-  },
-  other: {
-    'Vegetarian / vegan': 'vegetarian_vegan',
-    Halal: 'halal',
-  },
-};
+function emptyChecks() {
+  return Object.fromEntries(GROUP_KEYS.map((key) => [key, []]));
+}
 
-const ALL_CHECKBOX_COLUMNS = Object.values(CHECKBOX_COLUMNS).flatMap((group) => Object.values(group));
-
-const EMPTY_ROW = Object.fromEntries(ALL_CHECKBOX_COLUMNS.map((col) => [col, 0]));
-
-function rowToApiShape(row) {
-  if (!row) {
-    return {
-      checks: { allergies: [], intolerances: [], medicalConditions: [], other: [] },
-      mealChoice: null,
-      mealChoiceContext: null,
-      haulLength: null,
-      mealTime: null,
-      updatedAt: null,
-    };
-  }
-  const checks = {};
-  for (const [groupKey, items] of Object.entries(CHECKBOX_COLUMNS)) {
-    checks[groupKey] = Object.entries(items)
-      .filter(([, col]) => row[col] === 1)
-      .map(([label]) => label);
-  }
-  return {
-    checks,
-    mealChoice: row.meal_choice,
-    mealChoiceContext: row.meal_choice_context,
-    haulLength: row.haul_length,
-    mealTime: row.meal_time,
-    updatedAt: row.updated_at,
-  };
+function getSelectedConditions(seatId) {
+  return db
+    .prepare(
+      `SELECT hc.id, hc.label, hc.group_name AS groupName
+       FROM seat_conditions sc
+       JOIN health_conditions hc ON hc.id = sc.condition_id
+       WHERE sc.seat_id = ? AND hc.active = 1
+       ORDER BY hc.sort_order, hc.label`
+    )
+    .all(seatId);
 }
 
 function getPreferences(seatId) {
   const row = db.prepare('SELECT * FROM seat_preferences WHERE seat_id = ?').get(seatId);
-  return rowToApiShape(row);
+  const checks = emptyChecks();
+  for (const condition of getSelectedConditions(seatId)) {
+    checks[condition.groupName].push(condition.label);
+  }
+  return {
+    checks,
+    mealChoice: row ? row.meal_choice : null,
+    mealChoiceContext: row ? row.meal_choice_context : null,
+    haulLength: row ? row.haul_length : null,
+    mealTime: row ? row.meal_time : null,
+    updatedAt: row ? row.updated_at : null,
+  };
 }
 
 const EXTRA_FIELD_COLUMNS = {
@@ -74,60 +46,60 @@ const EXTRA_FIELD_COLUMNS = {
   mealTime: 'meal_time',
 };
 
-// Shared write path for a single seat's checkbox columns + meal/haul/time —
-// used by both the manual single-seat save and the bulk randomizer so the
-// insert/update SQL only lives in one place. Any `extra` field left
-// `undefined` is skipped (leaves the existing DB value untouched) rather
-// than being nulled out — different callers persist different subsets
-// (e.g. the menu-ordering page only ever touches haulLength, never mealTime).
-function writePreferenceRow(seatId, columnValues, extra = {}) {
-  const existing = db.prepare('SELECT 1 FROM seat_preferences WHERE seat_id = ?').get(seatId);
-  const columns = Object.keys(columnValues);
+// Writes the per-seat meal/haul/time fields. Any field left `undefined` is
+// skipped (the stored value is untouched) rather than nulled — different
+// callers persist different subsets (e.g. the menu page only ever sets haulLength).
+function writeExtraFields(seatId, extra) {
+  db.prepare('INSERT OR IGNORE INTO seat_preferences (seat_id) VALUES (?)').run(seatId);
 
-  const extraColumns = [];
-  const extraValues = [];
+  const assignments = [];
+  const values = [];
   for (const [field, column] of Object.entries(EXTRA_FIELD_COLUMNS)) {
     if (extra[field] === undefined) continue;
-    extraColumns.push(column);
-    extraValues.push(extra[field] ?? null);
+    assignments.push(`${column} = ?`);
+    values.push(extra[field] ?? null);
   }
+  assignments.push('updated_at = CURRENT_TIMESTAMP');
 
-  if (existing) {
-    const setClause = [...columns, ...extraColumns].map((col) => `${col} = ?`).join(', ');
-    db.prepare(
-      `UPDATE seat_preferences SET ${setClause}, updated_at = CURRENT_TIMESTAMP WHERE seat_id = ?`
-    ).run(...columns.map((col) => columnValues[col]), ...extraValues, seatId);
-  } else {
-    const allColumns = [...columns, ...extraColumns];
-    const placeholders = allColumns.map(() => '?').join(', ');
-    db.prepare(
-      `INSERT INTO seat_preferences (seat_id, ${allColumns.join(', ')}) VALUES (?, ${placeholders})`
-    ).run(seatId, ...columns.map((col) => columnValues[col]), ...extraValues);
-  }
+  db.prepare(`UPDATE seat_preferences SET ${assignments.join(', ')} WHERE seat_id = ?`).run(...values, seatId);
 }
 
-function checksToColumnValues(checks) {
-  const columnValues = { ...EMPTY_ROW };
-  for (const [groupKey, items] of Object.entries(CHECKBOX_COLUMNS)) {
-    const selected = new Set(checks[groupKey] || []);
-    for (const [label, col] of Object.entries(items)) {
-      if (selected.has(label)) columnValues[col] = 1;
+function replaceSeatConditions(seatId, conditionIds) {
+  db.prepare('DELETE FROM seat_conditions WHERE seat_id = ?').run(seatId);
+  const insert = db.prepare('INSERT OR IGNORE INTO seat_conditions (seat_id, condition_id) VALUES (?, ?)');
+  for (const conditionId of conditionIds) insert.run(seatId, conditionId);
+}
+
+// checks = { allergies: ['Peanuts', ...], ... } of human-readable labels -> condition ids.
+function checksToConditionIds(checks) {
+  const labelToId = getLabelToIdMap();
+  const ids = new Set();
+  for (const labels of Object.values(checks)) {
+    for (const label of labels) {
+      if (labelToId.has(label)) ids.add(labelToId.get(label));
     }
   }
-  return columnValues;
+  return [...ids];
 }
 
 // body.checks = { allergies: ['Peanuts', ...], intolerances: [...], medicalConditions: [...], other: [...] }
+//   (omit it to leave the seat's conditions untouched)
 // body.mealChoice / body.mealChoiceContext = single-choice wine name or veg/nonVeg + its haul/time context.
 // body.haulLength / body.mealTime = the passenger's own flight haul length and meal time, shown to crew.
-function upsertPreferences(seatId, body) {
-  const columnValues = checksToColumnValues(body.checks || {});
-  writePreferenceRow(seatId, columnValues, {
+const upsertTransaction = db.transaction((seatId, body) => {
+  writeExtraFields(seatId, {
     mealChoice: body.mealChoice,
     mealChoiceContext: body.mealChoiceContext,
     haulLength: body.haulLength,
     mealTime: body.mealTime,
   });
+  if (body.checks !== undefined) {
+    replaceSeatConditions(seatId, checksToConditionIds(body.checks));
+  }
+});
+
+function upsertPreferences(seatId, body) {
+  upsertTransaction(seatId, body);
   return getPreferences(seatId);
 }
 
@@ -135,10 +107,17 @@ function randomPick(array) {
   return array[Math.floor(Math.random() * array.length)];
 }
 
-// Gives each seat's checkboxes an independent ~25% chance of being checked
-// (so results look like a realistic sparse passenger mix, not everything
-// ticked), and picks a meal choice valid for that seat's class at the given
-// haul/time — mirroring exactly how the manual save path scopes mealChoiceContext.
+function shuffled(array) {
+  const copy = [...array];
+  for (let i = copy.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+// Picks a meal choice valid for that seat's class at the given haul/time —
+// mirroring exactly how the manual save path scopes mealChoiceContext.
 function randomMealChoiceFor(classType, haul, time) {
   if (classType === 'Economy') {
     const haulData = DINING.economy[haul];
@@ -151,21 +130,21 @@ function randomMealChoiceFor(classType, haul, time) {
   return { mealChoice: randomPick(wineList), mealChoiceContext: haul };
 }
 
+// Gives each seat's conditions an independent ~25% chance each (so results
+// look like a realistic sparse passenger mix), capped at MAX_CONDITIONS.
 function randomizeAllPreferences(haul, time) {
   if (!HAUL_LENGTHS.includes(haul)) throw new Error(`Invalid haul: ${haul}`);
   if (!TIME_WINDOWS.includes(time)) throw new Error(`Invalid time: ${time}`);
 
   const seats = getAllSeatsWithPreferenceFlag();
+  const conditions = listConditions();
 
   const randomizeAll = db.transaction(() => {
     for (const seat of seats) {
-      const checks = {};
-      for (const [groupKey, items] of Object.entries(CHECKBOX_COLUMNS)) {
-        checks[groupKey] = Object.keys(items).filter(() => Math.random() < 0.25);
-      }
-      const columnValues = checksToColumnValues(checks);
+      const picked = shuffled(conditions.filter(() => Math.random() < 0.25)).slice(0, MAX_CONDITIONS);
       const { mealChoice, mealChoiceContext } = randomMealChoiceFor(seat.classType, haul, time);
-      writePreferenceRow(seat.seatId, columnValues, { mealChoice, mealChoiceContext, haulLength: haul, mealTime: time });
+      writeExtraFields(seat.seatId, { mealChoice, mealChoiceContext, haulLength: haul, mealTime: time });
+      replaceSeatConditions(seat.seatId, picked.map((condition) => condition.id));
     }
   });
 
@@ -177,7 +156,7 @@ module.exports = {
   getPreferences,
   upsertPreferences,
   randomizeAllPreferences,
-  CHECKBOX_COLUMNS,
+  getSelectedConditions,
   HAUL_LENGTHS,
   TIME_WINDOWS,
 };

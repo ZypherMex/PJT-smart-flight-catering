@@ -2,6 +2,14 @@ require('dotenv').config();
 
 const app = require('./app');
 const { migrateSeatPreferencesColumns, seedSeatsIfEmpty, seedMenuIfEmpty, syncMenuImages } = require('./db/seed');
+const {
+  migrateMenuColumns,
+  backfillMenuCategories,
+  seedHealthConditionsIfEmpty,
+  migrateSeatConditionsFromColumns,
+  capSeatConditionsOnce,
+  tagUnreviewedMenuItems,
+} = require('./db/migrate');
 
 const PORT = process.env.PORT || 3000;
 
@@ -16,8 +24,21 @@ console.log(`Seats table ready (${seatCount} seats).`);
 const menuItemCount = seedMenuIfEmpty();
 console.log(`Menu table ready (${menuItemCount} items).`);
 
+migrateMenuColumns();
+const categorizedCount = backfillMenuCategories();
+if (categorizedCount) console.log(`Menu categories assigned (${categorizedCount} items).`);
+
 const syncedImageCount = syncMenuImages();
 console.log(`Menu photos synced (${syncedImageCount} items updated).`);
+
+const conditionCount = seedHealthConditionsIfEmpty();
+if (conditionCount) console.log(`Health conditions seeded (${conditionCount}).`);
+const copiedConditions = migrateSeatConditionsFromColumns();
+if (copiedConditions) console.log(`Migrated ${copiedConditions} existing seat condition selections.`);
+const trimmedConditions = capSeatConditionsOnce();
+if (trimmedConditions) console.log(`Trimmed ${trimmedConditions} condition selections on seats over the limit.`);
+const taggedCount = tagUnreviewedMenuItems();
+if (taggedCount) console.log(`Dish allergen/health tags inferred (${taggedCount} tags — pending staff review).`);
 
 app.listen(PORT, () => {
   console.log(`Smart Flight Catering app running at http://localhost:${PORT}`);
