@@ -56,13 +56,28 @@ Respond with exactly this JSON shape and nothing else:
 }
 Return at most the top 3 recommended meals, ordered best first.`;
 
+// The prompt asks for bare JSON, but models sometimes wrap it in a markdown code
+// fence (```json ... ```) or add a sentence around it. Accept all of those: take
+// the fenced block if there is one, otherwise the outermost { ... }.
 function extractJson(responseContent) {
   const textBlock = responseContent.find((block) => block.type === 'text');
   if (!textBlock) throw new Error('Claude response contained no text block');
+
+  let text = textBlock.text.trim();
+  const fenced = /```(?:json)?\s*([\s\S]*?)```/i.exec(text);
+  if (fenced) text = fenced[1].trim();
+  const start = text.indexOf('{');
+  const end = text.lastIndexOf('}');
+  if (start !== -1 && end > start) text = text.slice(start, end + 1);
+
   try {
-    return JSON.parse(textBlock.text);
+    const parsed = JSON.parse(text);
+    if (typeof parsed !== 'object' || parsed === null || !Array.isArray(parsed.recommendedMeals)) {
+      throw new Error('missing the "recommendedMeals" list');
+    }
+    return parsed;
   } catch (err) {
-    throw new Error(`Claude did not return valid JSON: ${err.message}. Raw text: ${textBlock.text.slice(0, 500)}`);
+    throw new Error(`Claude did not return usable JSON: ${err.message}. Raw text: ${textBlock.text.slice(0, 500)}`);
   }
 }
 
@@ -83,20 +98,33 @@ async function getMealRecommendation({ flightClass, haulLength, healthConditions
     availableMenu,
   };
 
-  const response = await anthropic.messages.create({
-    model: MODEL,
-    max_tokens: 4096,
-    system: SYSTEM_PROMPT,
-    thinking: { type: 'adaptive', display: 'omitted' },
-    output_config: { effort: 'low' },
-    messages: [{ role: 'user', content: JSON.stringify(payload) }],
-  });
+  // A model reply is not guaranteed to be well-formed, so a reply that still
+  // cannot be read after tolerant parsing gets exactly one more attempt. Network
+  // and gateway errors are not retried here: they surface straight away.
+  const MAX_ATTEMPTS = 2;
+  let parsed;
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt += 1) {
+    const response = await anthropic.messages.create({
+      model: MODEL,
+      max_tokens: 4096,
+      system: SYSTEM_PROMPT,
+      thinking: { type: 'adaptive', display: 'omitted' },
+      output_config: { effort: 'low' },
+      messages: [{ role: 'user', content: JSON.stringify(payload) }],
+    });
 
-  if (response.stop_reason === 'max_tokens') {
-    throw new Error('Claude response was truncated (hit max_tokens) before completing the JSON.');
+    try {
+      if (response.stop_reason === 'max_tokens') {
+        throw new Error('Claude response was truncated (hit max_tokens) before completing the JSON.');
+      }
+      parsed = extractJson(response.content);
+      break;
+    } catch (err) {
+      if (attempt === MAX_ATTEMPTS) throw err;
+      console.warn(`Meal recommendation reply unreadable (attempt ${attempt} of ${MAX_ATTEMPTS}), retrying: ${err.message.split('. Raw text')[0]}`);
+    }
   }
 
-  const parsed = extractJson(response.content);
   const recommendedMeals = filterToAvailableMenu(parsed.recommendedMeals, availableMenu);
 
   return {
@@ -106,4 +134,4 @@ async function getMealRecommendation({ flightClass, haulLength, healthConditions
   };
 }
 
-module.exports = { getMealRecommendation };
+module.exports = { getMealRecommendation, extractJson };
