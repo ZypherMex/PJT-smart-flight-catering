@@ -1,6 +1,7 @@
 const { getSeat } = require('./seatModel');
-const { getPreferences } = require('./preferenceModel');
+const { getPreferences, getSelectedConditions } = require('./preferenceModel');
 const { getFlatMenu } = require('./menuModel');
+const { getConflicts } = require('./compatibilityModel');
 
 // Flattens the seat's four checkbox groups (allergies, intolerances, medical
 // conditions, other/dietary) into one list — this IS the passenger's health
@@ -25,7 +26,13 @@ function buildRecommendationContext(seatId, haulLength) {
 
   const preferences = getPreferences(seatId);
   const healthConditions = flattenChecks(preferences.checks);
-  const availableMenu = getFlatMenu(seat.classType, haulLength);
+  // Dishes that conflict with the passenger's conditions are removed before the
+  // menu is sent, so the AI can never recommend one — claudeClient's existing
+  // "only IDs from the sent menu" filter then enforces this on the way back too.
+  const conditionIds = getSelectedConditions(seatId).map((condition) => condition.id);
+  const availableMenu = getFlatMenu(seat.classType, haulLength).filter(
+    (item) => getConflicts(item.id, conditionIds).length === 0
+  );
 
   return {
     seatId,

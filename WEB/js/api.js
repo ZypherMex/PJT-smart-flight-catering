@@ -1,5 +1,7 @@
 // Thin fetch() wrappers around the backend's /api/* endpoints.
 
+import { crewHeaders } from './crewAuth.js';
+
 async function getJson(url) {
   const res = await fetch(url);
   if (!res.ok) throw new Error(`GET ${url} failed: ${res.status}`);
@@ -39,7 +41,7 @@ export async function putSeatPreferences(seatId, body) {
 export async function randomizeAllPreferences(haul, time) {
   const res = await fetch('/api/seats/randomize-preferences', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...crewHeaders() },
     body: JSON.stringify({ haul, time }),
   });
   if (!res.ok) throw new Error(`Randomize preferences failed: ${res.status}`);

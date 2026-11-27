@@ -1,11 +1,5 @@
 import { getFleet } from './api.js';
-
-// Fleet/flight selection is crew-only — anyone landing here without having
-// passed the passkey prompt on the role-selector page gets sent back there.
-if (sessionStorage.getItem('crewUnlocked') !== '1') {
-  window.location.replace('index.html');
-  throw new Error('redirecting to role selector');
-}
+import { verifyCrewSession } from './crewAuth.js';
 
 function renderFleetCard(aircraft) {
   const isAvailable = aircraft.status === 'available';
@@ -28,6 +22,13 @@ function renderFleetCard(aircraft) {
 }
 
 async function init() {
+  // Fleet/flight selection is crew-only — anyone without a valid crew session
+  // goes back to the role selector.
+  if (!(await verifyCrewSession())) {
+    window.location.replace('index.html');
+    return;
+  }
+
   const grid = document.getElementById('fleetGrid');
   try {
     const { fleet } = await getFleet();

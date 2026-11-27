@@ -21,6 +21,12 @@ function migrateMenuColumns() {
   addColumnIfMissing('menu_items', 'tags_reviewed', 'INTEGER NOT NULL DEFAULT 0');
 }
 
+// The orders table shipped without edit_token; it carries no data yet, so a
+// plain nullable column is enough.
+function migrateOrderColumns() {
+  addColumnIfMissing('orders', 'edit_token', 'TEXT');
+}
+
 // Maps the menu's existing section names onto the five ordering categories.
 // Only fills rows with no category yet, so admin edits are never overwritten.
 function backfillMenuCategories() {
@@ -141,6 +147,7 @@ function tagUnreviewedMenuItems() {
 
 module.exports = {
   migrateMenuColumns,
+  migrateOrderColumns,
   backfillMenuCategories,
   seedHealthConditionsIfEmpty,
   migrateSeatConditionsFromColumns,

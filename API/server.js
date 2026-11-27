@@ -1,9 +1,12 @@
 require('dotenv').config();
 
+const http = require('http');
 const app = require('./app');
+const { initSocket } = require('./realtime/socket');
 const { migrateSeatPreferencesColumns, seedSeatsIfEmpty, seedMenuIfEmpty, syncMenuImages } = require('./db/seed');
 const {
   migrateMenuColumns,
+  migrateOrderColumns,
   backfillMenuCategories,
   seedHealthConditionsIfEmpty,
   migrateSeatConditionsFromColumns,
@@ -25,6 +28,7 @@ const menuItemCount = seedMenuIfEmpty();
 console.log(`Menu table ready (${menuItemCount} items).`);
 
 migrateMenuColumns();
+migrateOrderColumns();
 const categorizedCount = backfillMenuCategories();
 if (categorizedCount) console.log(`Menu categories assigned (${categorizedCount} items).`);
 
@@ -40,7 +44,12 @@ if (trimmedConditions) console.log(`Trimmed ${trimmedConditions} condition selec
 const taggedCount = tagUnreviewedMenuItems();
 if (taggedCount) console.log(`Dish allergen/health tags inferred (${taggedCount} tags — pending staff review).`);
 
-app.listen(PORT, () => {
+// 0.0.0.0 so phones on the same Wi-Fi can reach the server, not just this machine.
+const HOST = process.env.HOST || '0.0.0.0';
+const server = http.createServer(app);
+initSocket(server);
+
+server.listen(PORT, HOST, () => {
   console.log(`Smart Flight Catering app running at http://localhost:${PORT}`);
 });
 

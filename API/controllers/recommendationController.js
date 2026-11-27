@@ -24,6 +24,14 @@ async function recommendMealHandler(req, res) {
   // a passenger's request can't claim a class they're not actually seated in.
   const context = buildRecommendationContext(seatNumber, haulType);
 
+  if (!context.availableMenu.length) {
+    return res.json({
+      recommendedMeals: [],
+      summary: 'No meal on this menu is compatible with the declared health conditions.',
+      confidence: null,
+    });
+  }
+
   try {
     const recommendation = await getMealRecommendation({
       flightClass: context.flightClass,

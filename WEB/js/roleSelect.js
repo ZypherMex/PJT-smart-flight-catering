@@ -1,11 +1,9 @@
-// Demo-only gate: this passkey lives entirely in frontend JS and only sets a
-// sessionStorage flag. There is no backend session/auth — it keeps curious
-// customers out of the crew view, nothing more. Do not treat this as real security.
-const CREW_PASSKEY = '123490';
+import { loginCrew } from './crewAuth.js';
 
 const modal = document.getElementById('passkeyModal');
 const input = document.getElementById('passkeyInput');
 const errorEl = document.getElementById('passkeyError');
+const submitBtn = document.getElementById('passkeySubmit');
 
 function openModal() {
   errorEl.hidden = true;
@@ -18,12 +16,15 @@ function closeModal() {
   modal.hidden = true;
 }
 
-function trySubmit() {
-  if (input.value === CREW_PASSKEY) {
-    sessionStorage.setItem('crewUnlocked', '1');
+async function trySubmit() {
+  submitBtn.disabled = true;
+  const result = await loginCrew(input.value);
+  submitBtn.disabled = false;
+  if (result.ok) {
     window.location.href = 'fleet.html';
     return;
   }
+  errorEl.textContent = result.message;
   errorEl.hidden = false;
 }
 
@@ -33,7 +34,7 @@ document.getElementById('customerCard').addEventListener('click', () => {
 
 document.getElementById('crewCard').addEventListener('click', openModal);
 document.getElementById('passkeyCancel').addEventListener('click', closeModal);
-document.getElementById('passkeySubmit').addEventListener('click', trySubmit);
+submitBtn.addEventListener('click', trySubmit);
 input.addEventListener('keydown', (e) => {
   if (e.key === 'Enter') trySubmit();
 });

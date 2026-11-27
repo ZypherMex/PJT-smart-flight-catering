@@ -104,7 +104,8 @@ CREATE TABLE IF NOT EXISTS orders (
   haul_length    TEXT NOT NULL CHECK(haul_length IN ('shortHaul','mediumHaul','longHaul')),
   status         TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending','preparing','prepared','delivered','completed')),
   placed_at      TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at     TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+  updated_at     TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  edit_token     TEXT
 );
 
 CREATE TABLE IF NOT EXISTS order_items (

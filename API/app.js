@@ -7,13 +7,19 @@ const diningRoutes = require('./routes/diningRoutes');
 const aircraftRoutes = require('./routes/aircraftRoutes');
 const menuRoutes = require('./routes/menuRoutes');
 const recommendationRoutes = require('./routes/recommendationRoutes');
+const crewRoutes = require('./routes/crewRoutes');
+const orderRoutes = require('./routes/orderRoutes');
+const healthConditionRoutes = require('./routes/healthConditionRoutes');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
 
-app.use(express.json());
+app.use(express.json({ limit: '100kb' }));
 app.use(express.static(path.join(__dirname, '..', 'WEB')));
 
+app.use('/api', crewRoutes);
+app.use('/api', healthConditionRoutes);
+app.use('/api', orderRoutes);
 app.use('/api', seatRoutes);
 app.use('/api', preferenceRoutes);
 app.use('/api', diningRoutes);

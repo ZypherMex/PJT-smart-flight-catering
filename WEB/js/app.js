@@ -2,18 +2,18 @@ import { getGridConfig, getAllSeats, getDiningMatrix, randomizeAllPreferences } 
 import { renderSeatMap, highlightSelectedSeat, setSeatHasPrefs } from './seatGrid.js';
 import { openSeatPanel, closePanel } from './preferencePanel.js';
 import { openCrewPanel, closeCrewPanel } from './crewPanel.js';
+import { verifyCrewSession } from './crewAuth.js';
 
 const mode = new URLSearchParams(window.location.search).get('mode') === 'crew' ? 'crew' : 'customer';
 
-// Flight/aircraft selection is crew-only — a customer link never carries
-// ?mode=crew, so this only ever blocks someone who typed the URL by hand
-// without going through the passkey prompt on the role-selector page.
-function guardCrewAccess() {
-  if (mode === 'crew' && sessionStorage.getItem('crewUnlocked') !== '1') {
-    window.location.replace('index.html');
-    return false;
-  }
-  return true;
+// Crew mode needs a valid crew session (checked with the server). A customer
+// link never carries ?mode=crew, so this only blocks someone who typed it by
+// hand without signing in on the role-selector page.
+async function guardCrewAccess() {
+  if (mode !== 'crew') return true;
+  if (await verifyCrewSession()) return true;
+  window.location.replace('index.html');
+  return false;
 }
 
 const state = { haul: 'shortHaul', time: 'lunchDinner', gridConfig: null, diningMatrix: null, currentSeat: null, currentCabinKey: null };
@@ -95,7 +95,7 @@ document.addEventListener('panel-closed', () => {
 });
 
 async function init() {
-  if (!guardCrewAccess()) return;
+  if (!(await guardCrewAccess())) return;
   document.body.classList.add(mode === 'crew' ? 'mode-crew' : 'mode-customer');
 
   const [gridConfig, seats, diningMatrix] = await Promise.all([getGridConfig(), getAllSeats(), getDiningMatrix()]);
