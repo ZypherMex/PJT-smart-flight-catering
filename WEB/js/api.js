@@ -2,8 +2,10 @@
 
 import { crewHeaders } from './crewAuth.js';
 
+// The crew token (if there is one) is always sent: the seat list and a seat's
+// saved conditions return more to a signed-in crew member than to the public.
 async function getJson(url) {
-  const res = await fetch(url);
+  const res = await fetch(url, { headers: crewHeaders() });
   if (!res.ok) throw new Error(`GET ${url} failed: ${res.status}`);
   return res.json();
 }
@@ -20,24 +22,12 @@ export function getAllSeats() {
   return getJson('/api/seats');
 }
 
-export function getDiningMatrix() {
-  return getJson('/api/dining-matrix');
-}
-
+// Crew only.
 export function getSeatPreferences(seatId) {
   return getJson(`/api/seats/${encodeURIComponent(seatId)}/preferences`);
 }
 
-export async function putSeatPreferences(seatId, body) {
-  const res = await fetch(`/api/seats/${encodeURIComponent(seatId)}/preferences`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
-  if (!res.ok) throw new Error(`PUT preferences for ${seatId} failed: ${res.status}`);
-  return res.json();
-}
-
+// Crew only.
 export async function randomizeAllPreferences(haul, time) {
   const res = await fetch('/api/seats/randomize-preferences', {
     method: 'POST',

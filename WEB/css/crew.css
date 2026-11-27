@@ -12,14 +12,14 @@
 .op-live.is-live::before{background:var(--good);}
 
 .cr-main{max-width:1500px;margin:0 auto;padding:16px 16px 60px;}
-.cr-banner{background:#fde8ec;color:var(--danger);border-radius:12px;padding:12px 16px;margin-bottom:12px;font-weight:700;font-size:14px;}
+.cr-banner{background:var(--danger-bg);color:var(--danger);border-radius:12px;padding:12px 16px;margin-bottom:12px;font-weight:700;font-size:14px;}
 
 /* status filter chips */
 .cr-status-chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
 .cr-chip-btn{min-height:46px;padding:0 16px;border-radius:999px;border:1.5px solid var(--border);background:var(--card-bg);color:var(--text);font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;display:inline-flex;align-items:center;gap:8px;}
 .cr-chip-btn b{background:var(--surface-2);border-radius:999px;padding:2px 9px;font-size:13px;}
-.cr-chip-btn.is-active{background:var(--emirates-navy);border-color:var(--emirates-navy);color:#fff;}
-.cr-chip-btn.is-active b{background:rgba(255,255,255,.18);color:#fff;}
+.cr-chip-btn.is-active{background:var(--text);border-color:var(--text);color:var(--card-bg);}
+.cr-chip-btn.is-active b{background:rgba(128,128,128,.28);color:var(--card-bg);}
 
 /* filters — sticky so they stay reachable while scrolling a long list */
 .cr-controls{position:sticky;top:0;z-index:10;background:var(--bg);padding:8px 0 12px;display:grid;grid-template-columns:2fr 1fr 1.4fr auto;gap:12px;align-items:end;}
@@ -33,7 +33,7 @@
 
 /* the board */
 .cr-board{margin-top:4px;}
-.cr-head,.cr-row{display:grid;grid-template-columns:170px minmax(150px,1.1fr) repeat(5,minmax(128px,1fr)) 210px;gap:12px;align-items:center;}
+.cr-head,.cr-row{display:grid;grid-template-columns:150px minmax(120px,1.1fr) repeat(5,minmax(100px,1fr)) 190px;gap:12px;align-items:center;}
 .cr-head{padding:0 16px 8px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);}
 .cr-list{display:flex;flex-direction:column;gap:10px;}
 .cr-row{background:var(--card-bg);border:1px solid var(--border);border-left:6px solid var(--border);border-radius:14px;padding:12px 16px;box-shadow:var(--shadow);transition:opacity .15s ease;}
@@ -44,7 +44,7 @@
 .cr-row[data-status="completed"]{border-left-color:var(--border);opacity:.7;}
 .cr-row.is-busy{opacity:.55;pointer-events:none;}
 .cr-row.is-flash{animation:crFlash 1.8s ease-out;}
-@keyframes crFlash{from{background:#fff3c4;}to{background:var(--card-bg);}}
+@keyframes crFlash{from{background:var(--flash);}to{background:var(--card-bg);}}
 
 .cr-seat-id{font-size:28px;font-weight:800;line-height:1;margin-bottom:6px;}
 .cr-pax{margin-top:6px;font-size:12px;color:var(--muted);font-weight:600;overflow-wrap:anywhere;}
@@ -62,10 +62,10 @@
 
 .cr-status{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;}
 .cr-pill{justify-self:start;border-radius:999px;padding:5px 12px;font-size:12px;font-weight:800;}
-.st-pending{background:#fdf0d5;color:#8a5a00;}
+.st-pending{background:var(--warn-bg);color:var(--warn-fg);}
 .st-preparing{background:var(--economy-tint);color:var(--economy);}
 .st-prepared{background:var(--business-tint);color:var(--business);}
-.st-delivered{background:#e6f6ec;color:var(--good);}
+.st-delivered{background:var(--good-bg);color:var(--good-text);}
 .st-completed{background:var(--border-soft);color:var(--muted);}
 .cr-advance{grid-column:1 / -1;min-height:50px;border:0;border-radius:12px;background:var(--emirates-red);color:#fff;font-size:15px;font-weight:800;font-family:inherit;cursor:pointer;}
 .cr-advance:disabled{background:var(--border-soft);color:var(--muted);cursor:default;}
@@ -77,7 +77,8 @@
 
 /* wide: thin dividers so an empty "-" cell never reads as part of the dish beside it */
 @media (min-width:1200px){
-  .cr-meal{padding-left:12px;border-left:1px solid var(--border-soft);align-self:stretch;}
+  /* thumbnail above the name, so a long dish name gets the whole column instead of half of it */
+  .cr-meal{flex-direction:column;align-items:flex-start;justify-content:center;gap:6px;padding-left:12px;border-left:1px solid var(--border-soft);align-self:stretch;}
   .cr-head > div:nth-child(n+3):nth-child(-n+7){padding-left:12px;}
 }
 

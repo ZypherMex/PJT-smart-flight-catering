@@ -1,4 +1,7 @@
+const fs = require('fs');
+const path = require('path');
 const db = require('./connection');
+const { WEB_DIR } = require('../utils/images');
 const { RESTRICTION_TAGS, BUILTIN_CONDITIONS, inferItemTags } = require('../data/healthConditions');
 const { MAX_CONDITIONS } = require('../config');
 
@@ -122,6 +125,23 @@ function capSeatConditionsOnce() {
   return removed;
 }
 
+// Dishes whose photo is still the original full-size PNG are pointed at its
+// optimised WebP twin (see npm run optimize-images). Only rows whose WebP file
+// really exists are touched, so this is safe to run on every start.
+function migrateMenuImagesToWebp() {
+  const rows = db.prepare("SELECT id, image_url AS imageUrl FROM menu_items WHERE image_url LIKE '/images/menu/%.png'").all();
+  const update = db.prepare('UPDATE menu_items SET image_url = ? WHERE id = ?');
+  let moved = 0;
+  for (const row of rows) {
+    const webp = row.imageUrl.replace(/.png$/i, '.webp');
+    if (fs.existsSync(path.join(WEB_DIR, webp))) {
+      update.run(webp, row.id);
+      moved += 1;
+    }
+  }
+  return moved;
+}
+
 // Gives every not-yet-reviewed, not-yet-tagged dish its inferred tags. Dishes
 // staff have reviewed (tags_reviewed = 1) or already tagged are left alone.
 function tagUnreviewedMenuItems() {
@@ -152,5 +172,6 @@ module.exports = {
   seedHealthConditionsIfEmpty,
   migrateSeatConditionsFromColumns,
   capSeatConditionsOnce,
+  migrateMenuImagesToWebp,
   tagUnreviewedMenuItems,
 };

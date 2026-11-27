@@ -1,6 +1,5 @@
-import { getGridConfig, getAllSeats, getDiningMatrix, randomizeAllPreferences } from './api.js';
+import { getGridConfig, getAllSeats, randomizeAllPreferences } from './api.js';
 import { renderSeatMap, highlightSelectedSeat, setSeatHasPrefs } from './seatGrid.js';
-import { openSeatPanel, closePanel } from './preferencePanel.js';
 import { openCrewPanel, closeCrewPanel } from './crewPanel.js';
 import { verifyCrewSession } from './crewAuth.js';
 import { mountCrewNav } from './crewNav.js';
@@ -17,29 +16,23 @@ async function guardCrewAccess() {
   return false;
 }
 
-const state = { haul: 'shortHaul', time: 'lunchDinner', gridConfig: null, diningMatrix: null, currentSeat: null, currentCabinKey: null };
+const state = { haul: 'shortHaul', time: 'lunchDinner', gridConfig: null, currentSeat: null, currentCabinKey: null };
 
 function cabinByKey(gridConfig, key) {
   return gridConfig.cabins.find((c) => c.key === key);
 }
 
-function closeActivePanel() {
-  if (mode === 'crew') closeCrewPanel();
-  else closePanel();
-}
-
+// Customers only choose their seat here; everything they declare happens on the
+// ordering page, tied to their own device.
 async function onSeatClick(seatId, cabinKey) {
   highlightSelectedSeat(seatId);
+  if (mode === 'customer') {
+    window.location.href = `order.html?seat=${encodeURIComponent(seatId)}`;
+    return;
+  }
   state.currentSeat = seatId;
   state.currentCabinKey = cabinKey;
-  const cabin = cabinByKey(state.gridConfig, cabinKey);
-  if (mode === 'crew') {
-    await openCrewPanel(seatId, cabin);
-  } else {
-    await openSeatPanel(seatId, cabin, state.diningMatrix, (savedSeatId) => {
-      setSeatHasPrefs(savedSeatId, true);
-    });
-  }
+  await openCrewPanel(seatId, cabinByKey(state.gridConfig, cabinKey));
 }
 
 async function refreshSeatIndicators() {
@@ -49,7 +42,7 @@ async function refreshSeatIndicators() {
 
 async function onRandomizeClick() {
   const confirmed = window.confirm(
-    'This will overwrite every seat\'s saved allergy, medical and dining preferences with new random values. Continue?'
+    "This will overwrite every seat's saved allergy, medical and dining preferences with new random values. Continue?"
   );
   if (!confirmed) return;
 
@@ -70,9 +63,8 @@ async function onRandomizeClick() {
   }
 }
 
-// The page-level haul/time selectors only exist in crew mode, and only drive
-// the bulk randomizer there — per-seat haul/time now lives in the customer's
-// own panel (preferencePanel.js) and is saved per seat, not picked globally.
+// The page-level haul/time selectors only exist in crew mode, where they only
+// drive the bulk randomizer.
 function wireCrewControls() {
   const haulSelect = document.getElementById('haulSelect');
   const timeSelect = document.getElementById('timeSelect');
@@ -95,18 +87,26 @@ document.addEventListener('panel-closed', () => {
   state.currentCabinKey = null;
 });
 
+function applyCustomerWording() {
+  document.getElementById('heroTitle').innerHTML = 'Find your<br>seat.';
+  document.getElementById('heroSub').innerHTML =
+    'Tap your seat on the aircraft to start ordering your meal. Nose (Row 1) at left &rarr; Tail (Row 43) at right.';
+}
+
 async function init() {
   if (!(await guardCrewAccess())) return;
   if (mode === 'crew') mountCrewNav('seatmap');
+  else applyCustomerWording();
   document.body.classList.add(mode === 'crew' ? 'mode-crew' : 'mode-customer');
 
-  const [gridConfig, seats, diningMatrix] = await Promise.all([getGridConfig(), getAllSeats(), getDiningMatrix()]);
+  const [gridConfig, seats] = await Promise.all([getGridConfig(), getAllSeats()]);
   state.gridConfig = gridConfig;
-  state.diningMatrix = diningMatrix;
 
   renderSeatMap(gridConfig, seats, onSeatClick);
-  if (mode === 'crew') wireCrewControls();
-  closeActivePanel();
+  if (mode === 'crew') {
+    wireCrewControls();
+    closeCrewPanel();
+  }
 }
 
 init().catch((err) => {

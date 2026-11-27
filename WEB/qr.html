@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Passenger QR code — Smart Catering</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/qr.css">
+<script src="js/theme.js"></script>
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="wordmark" href="index.html">fly<span>cater</span><span class="dot">.</span></a>
+      <nav class="topbar-nav"></nav>
+    </div>
+  </header>
+
+  <section class="qr-header">
+    <div class="qr-header-inner">
+      <div class="hero-eyebrow">Passenger access</div>
+      <h1>QR code</h1>
+      <p>Print this and place it on seat screens, tray tables or inflight menus. Passengers scan it and the ordering page opens in their browser. No app and no account.</p>
+    </div>
+  </section>
+
+  <main class="qr-main">
+
+    <section class="qr-card qr-controls">
+      <h2>Address passengers will use</h2>
+      <p class="qr-note">Phones must be on the same Wi-Fi or network as this computer. If this computer has several networks, choose the one passengers join.</p>
+      <div class="qr-field">
+        <label for="addressSelect">Network</label>
+        <select id="addressSelect"></select>
+      </div>
+      <div class="qr-field">
+        <label for="customUrl">Or type your own address <span>(optional)</span></label>
+        <div class="qr-inline">
+          <input id="customUrl" type="url" inputmode="url" placeholder="http://192.168.1.100:3000" autocomplete="off">
+          <button type="button" class="qr-btn" id="useCustom">Use this</button>
+        </div>
+        <div class="qr-error" id="customError" hidden></div>
+      </div>
+    </section>
+
+    <section class="qr-card qr-sheet" id="printSheet">
+      <div class="qr-sheet-title">Order your meal</div>
+      <div class="qr-code" id="qrBox"><div class="qr-loading">Loading&hellip;</div></div>
+      <div class="qr-sheet-sub">Scan with your phone camera</div>
+      <div class="qr-link" id="qrLink"></div>
+      <div class="qr-sheet-fine">Connect to the aircraft Wi-Fi first</div>
+    </section>
+
+    <div class="qr-actions">
+      <button type="button" class="qr-btn qr-btn-primary" id="printBtn">Print</button>
+      <a class="qr-btn" id="downloadBtn" href="#" download>Download image</a>
+      <button type="button" class="qr-btn" id="copyBtn">Copy link</button>
+      <a class="qr-btn" id="openBtn" href="#" target="_blank" rel="noopener">Open the page</a>
+    </div>
+
+    <section class="qr-card qr-help">
+      <h2>If a phone can't open it</h2>
+      <ol>
+        <li>Check the phone is on the same Wi-Fi as this computer (not mobile data, not a guest network that blocks devices).</li>
+        <li>Try typing the address above into the phone's browser instead of scanning.</li>
+        <li>On Windows, the first run may ask to allow the server through the firewall. Choose <strong>Allow</strong> for private networks.</li>
+        <li>Still stuck? Set <code>PUBLIC_URL</code> in the <code>.env</code> file to the correct address and restart the server.</li>
+      </ol>
+    </section>
+
+  </main>
+
+  <div class="qr-toast" id="toast" role="status" hidden></div>
+  <script type="module" src="js/qr.js"></script>
+</body>
+</html>

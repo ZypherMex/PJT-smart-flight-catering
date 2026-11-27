@@ -6,6 +6,7 @@
 <title>Order your meal — Smart Catering</title>
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/order.css">
+<script src="js/theme.js"></script>
 </head>
 <body>
 
@@ -65,6 +66,13 @@
         <p class="op-sub">Optional. Meals that don't suit your conditions are greyed out with the reason. <span id="conditionCounter"></span></p>
         <div id="conditionChips"></div>
         <p class="op-fineprint">This is a guide only. Always tell the cabin crew about severe allergies.</p>
+      </section>
+
+      <section class="op-card" id="aiCard">
+        <h2>Not sure what to choose?</h2>
+        <p class="op-sub">Get up to three suggestions that suit your health conditions, picked only from dishes you can order.</p>
+        <button type="button" class="op-btn op-btn-block op-btn-ghost" id="aiBtn">Suggest meals for me</button>
+        <div id="aiResult" aria-live="polite"></div>
       </section>
 
       <section id="menuSection">

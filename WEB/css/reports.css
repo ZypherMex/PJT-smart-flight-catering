@@ -1,7 +1,7 @@
 /* Reports tab. Chart colours follow the dataviz palette: one categorical hue
    (blue, slot 1) for single-series charts, a lighter step of the same ramp for
    meter tracks, and the reserved warning / critical colours only for stock state.
-   The dark values apply under [data-theme="dark"] (set by the site's theme toggle). */
+   The dark values apply under [data-theme="dark"] (set by the theme toggle in js/theme.js). */
 
 .rp{
   --rp-s1:#2a78d6;

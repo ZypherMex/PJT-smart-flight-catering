@@ -1,5 +1,6 @@
 import { escapeHtml } from './util.js';
 import { ApiError, getHealthConditions, getSeatInfo, getPortalMenu, placeOrder, getMyOrder } from './orderApi.js';
+import { recommendMeal } from './recommendApi.js';
 
 const CATEGORY_LABELS = {
   snack: 'Snack',
@@ -61,6 +62,7 @@ const state = {
   health: { maxConditions: 5, conditions: [] },
   notices: [],
   busy: false,
+  ai: { loading: false, result: null, error: null },
 };
 
 const isLocked = () => !!state.order && state.order.status !== 'pending';
@@ -160,6 +162,71 @@ function applyConditionCap() {
   $('conditionCounter').textContent = `${state.conditions.size} of ${state.health.maxConditions} selected.`;
 }
 
+function renderAi() {
+  const button = $('aiBtn');
+  const out = $('aiResult');
+  const { loading, result, error } = state.ai;
+
+  button.disabled = loading || isLocked();
+  button.textContent = loading ? 'Thinking…' : result ? 'Suggest again' : 'Suggest meals for me';
+
+  if (error) {
+    out.innerHTML = `<div class="op-notice op-notice-error">${escapeHtml(error)}</div>`;
+    return;
+  }
+  if (!result) {
+    out.innerHTML = '';
+    return;
+  }
+
+  const picks = result.recommendedMeals
+    .map((meal) => ({ meal, item: findMenuItem(meal.mealId) }))
+    .filter(({ item }) => item);
+  const chosen = (item) => state.selections[item.category] === item.id;
+
+  out.innerHTML = `
+    ${result.summary ? `<p class="op-ai-summary">${escapeHtml(result.summary)}</p>` : ''}
+    <div class="op-ai-list">${picks
+      .map(
+        ({ meal, item }) => `<div class="op-ai-pick">
+          <div class="op-ai-head"><strong>${escapeHtml(item.name)}</strong><span class="badge badge-live">${Number(meal.score) || 0}% match</span></div>
+          <div class="op-ai-cat">${CATEGORY_LABELS[item.category]}</div>
+          <p>${escapeHtml(meal.reason)}</p>
+          <button type="button" class="op-btn op-btn-small${chosen(item) ? ' op-btn-ghost' : ''}" data-ai-choose="${item.id}" ${isLocked() ? 'disabled' : ''}>${chosen(item) ? 'Chosen ✓' : 'Choose this'}</button>
+        </div>`
+      )
+      .join('')}</div>${picks.length ? '' : '<p class="op-empty">No suggestions this time. Please choose from the menu below.</p>'}`;
+}
+
+async function onAiClick() {
+  if (state.ai.loading || isLocked()) return;
+  state.ai = { loading: true, result: null, error: null };
+  renderAi();
+  try {
+    const result = await recommendMeal({
+      seatNumber: state.seatId,
+      haulType: state.haul,
+      conditions: [...state.conditions],
+      selectedMeals: Object.values(state.selections).filter(Boolean),
+    });
+    state.ai = { loading: false, result, error: null };
+  } catch (err) {
+    state.ai = { loading: false, result: null, error: friendlyError(err) };
+  }
+  renderAi();
+}
+
+function onAiChoose(event) {
+  const button = event.target.closest('[data-ai-choose]');
+  if (!button || isLocked()) return;
+  const item = findMenuItem(Number(button.getAttribute('data-ai-choose')));
+  if (!item || item.conflicts.length || item.soldOut) return;
+  state.selections[item.category] = item.id;
+  setNotices([]);
+  syncSelectionUI();
+  renderAi();
+}
+
 function mealCard(item) {
   const selected = state.selections[item.category] === item.id;
   const conflict = item.conflicts.length ? item.conflicts[0].message : null;
@@ -219,6 +286,7 @@ function syncSelectionUI() {
 
 function applyLockState() {
   $('detailSections').classList.toggle('is-locked', isLocked());
+  renderAi();
   renderHaul();
   applyConditionCap();
 }
@@ -280,6 +348,7 @@ function renderAll() {
   renderHaul();
   renderConditions();
   renderMenu();
+  renderAi();
   renderStatus();
   renderActionBar();
   renderNotices();
@@ -438,6 +507,8 @@ function onConditionClick(event) {
   } else {
     return;
   }
+  state.ai = { loading: false, result: null, error: null };
+  renderAi();
   chip.classList.toggle('is-on', state.conditions.has(id));
   chip.setAttribute('aria-pressed', String(state.conditions.has(id)));
   applyConditionCap();
@@ -454,6 +525,8 @@ function onHaulClick(event) {
   if (haul === state.haul) return;
 
   state.haul = haul;
+  state.ai = { loading: false, result: null, error: null };
+  renderAi();
   state.selections = emptySelections(); // dishes are specific to a flight length
   setNotices([{ type: 'info', text: 'Menu updated for your flight length — please choose again.' }]);
   renderHaul();
@@ -618,6 +691,8 @@ function bindEvents() {
   $('conditionChips').addEventListener('click', onConditionClick);
   $('menuCategories').addEventListener('click', onMealClick);
   $('placeOrderBtn').addEventListener('click', onPlaceOrder);
+  $('aiBtn').addEventListener('click', onAiClick);
+  $('aiResult').addEventListener('click', onAiChoose);
 }
 
 async function init() {
@@ -634,10 +709,13 @@ async function init() {
   connectSocket();
   renderAll();
 
-  const savedSeat = store.get('meal.seat');
-  if (savedSeat) {
-    $('seatInput').value = savedSeat;
-    await submitSeat(savedSeat);
+  const params = new URLSearchParams(window.location.search);
+  const linkedSeat = params.get('seat');
+  if (linkedSeat) window.history.replaceState(null, '', 'order.html'); // keep the address bar tidy
+  const startSeat = linkedSeat || store.get('meal.seat');
+  if (startSeat) {
+    $('seatInput').value = startSeat;
+    await submitSeat(startSeat);
   }
 }
 

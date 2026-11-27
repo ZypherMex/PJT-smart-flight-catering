@@ -2,6 +2,18 @@
   --bg:#f7f5ef;
   --card-bg:#ffffff;
   --surface-2:#fafaf6;     /* muted panels sitting on a card */
+  --warn-bg:#fdf0d5;
+  --warn-fg:#8a5a00;
+  --warn-border:#f0d9a0;
+  --danger-bg:#fde8ec;
+  --danger-border:#f6c9d2;
+  --good-bg:#e6f6ec;
+  --good-text:#0e6a35;      /* green safe to use as TEXT on white or a pale tint */
+  --accent-text:#8a6320;   /* gold safe to use as TEXT on white or a pale tint */
+  --on-accent-text:#ffffff;
+  --flash:#fff3c4;         /* "just changed" highlight */
+  --ring:#ffffff;          /* gap drawn around small badges on the seat map */
+  --overlay:rgba(20,16,10,.55);
   --text:#201a14;
   --muted:#6b6459;
   --border:#e7e1d3;
@@ -17,6 +29,38 @@
   --good:#1f9d55;
   --danger:#c8102e;
   --shadow:0 1px 2px rgba(20,16,10,.04), 0 10px 28px rgba(20,16,10,.07);
+}
+/* Dark theme. Set by js/theme.js (saved choice, else the device setting). */
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0d0d0d;
+  --card-bg:#1a1a19;
+  --surface-2:#232321;
+  --text:#f0efec;
+  --muted:#a9a79e;
+  --border:#363632;
+  --border-soft:#2b2b28;
+  --accent:#e0b25a;
+  --accent-tint:#3a2e14;
+  --business:#46c4a6;
+  --business-tint:#12302a;
+  --economy:#78aaf0;
+  --economy-tint:#15263d;
+  --good:#3ccf6d;
+  --danger:#ff7676;
+  --shadow:0 1px 2px rgba(0,0,0,.45), 0 10px 28px rgba(0,0,0,.4);
+  --warn-bg:#3a2d0c;
+  --warn-fg:#f2c45e;
+  --warn-border:#5a4513;
+  --danger-bg:#3b1a20;
+  --danger-border:#5c2a33;
+  --good-bg:#11321f;
+  --good-text:#5fd38a;
+  --accent-text:#e0b25a;
+  --on-accent-text:#1a1405;
+  --flash:#4a3d12;
+  --ring:#1a1a19;
+  --overlay:rgba(0,0,0,.68);
 }
 *{box-sizing:border-box;}
 /* Without this, any element given an explicit display (flex, grid...) ignores the hidden attribute. */
@@ -62,6 +106,7 @@ body{
 /* Customers never see the page-level haul/time/randomize controls — those
    are crew-only (bulk demo data); customers set haul/time per seat instead. */
 body.mode-customer .hero-controls{display:none;}
+body.mode-customer .crew-only{display:none;}
 
 /* ---------- Controls ---------- */
 .control-group{display:flex;flex-direction:column;gap:6px;}
@@ -133,7 +178,7 @@ body.mode-customer .hero-controls{display:none;}
   overflow:hidden;
   border:1px solid var(--border-soft);
   border-radius:14px;
-  background:#fafaf6;
+  background:var(--surface-2);
   padding:18px 20px;
 }
 .seatmap-scale{
@@ -149,7 +194,7 @@ body.mode-customer .hero-controls{display:none;}
 .cabin-header{display:flex;align-items:baseline;gap:10px;margin-bottom:12px;white-space:nowrap;}
 .cabin-header h2{margin:0;font-size:14px;font-weight:700;}
 .seat-count{font-size:11px;color:var(--muted);font-weight:500;}
-.cabin-first-section .cabin-header h2{color:var(--accent);}
+.cabin-first-section .cabin-header h2{color:var(--accent-text);}
 .cabin-business-section .cabin-header h2{color:var(--business);}
 .cabin-economy-section .cabin-header h2{color:var(--economy);}
 
@@ -183,7 +228,7 @@ body.mode-customer .hero-controls{display:none;}
 
 .seat.has-prefs::after{
   content:'';position:absolute;top:-3px;right:-3px;width:8px;height:8px;border-radius:50%;
-  background:var(--good);box-shadow:0 0 0 2px #fff;
+  background:var(--good);box-shadow:0 0 0 2px var(--ring);
 }
 
 /* ---------- Panel ---------- */
@@ -192,17 +237,17 @@ body.mode-customer .hero-controls{display:none;}
 .panel-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;border-bottom:1px solid var(--border-soft);padding-bottom:16px;margin-bottom:18px;}
 .panel-seat{font-size:28px;font-weight:800;margin-right:14px;}
 .panel-class{display:inline-block;padding:4px 13px;border-radius:999px;font-size:11.5px;font-weight:700;letter-spacing:.02em;}
-.cabin-first-tag{background:var(--accent-tint);color:var(--accent);}
+.cabin-first-tag{background:var(--accent-tint);color:var(--accent-text);}
 .cabin-business-tag{background:var(--business-tint);color:var(--business);}
 .cabin-economy-tag{background:var(--economy-tint);color:var(--economy);}
 .close-btn{background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:8px 14px;cursor:pointer;font-size:13px;font-weight:600;}
 .close-btn:hover{background:var(--border-soft);}
 
-.save-indicator{font-size:12px;color:var(--good);font-weight:600;opacity:0;transition:opacity .25s ease;}
+.save-indicator{font-size:12px;color:var(--good-text);font-weight:600;opacity:0;transition:opacity .25s ease;}
 .save-indicator.visible{opacity:1;}
 
 .pref-groups{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px;margin-bottom:22px;}
-.pref-group{background:#fafaf6;border:1px solid var(--border-soft);border-radius:12px;padding:14px 16px;}
+.pref-group{background:var(--surface-2);border:1px solid var(--border-soft);border-radius:12px;padding:14px 16px;}
 .pref-group h4{margin:0 0 8px;font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:700;}
 .chk{display:flex;gap:9px;align-items:center;font-size:13.5px;padding:5px 0;cursor:pointer;color:var(--text);}
 .chk input{width:16px;height:16px;cursor:pointer;accent-color:var(--emirates-red);}
@@ -210,13 +255,13 @@ body.mode-customer .hero-controls{display:none;}
 .chk-disabled input{cursor:not-allowed;}
 .condition-counter{margin:0 0 10px;font-size:12px;font-weight:600;color:var(--muted);}
 
-.dining-section{background:#fafaf6;border:1px solid var(--border-soft);border-radius:14px;padding:18px 20px 22px;margin-bottom:20px;}
+.dining-section{background:var(--surface-2);border:1px solid var(--border-soft);border-radius:14px;padding:18px 20px 22px;margin-bottom:20px;}
 .dining-section h3{margin:0 0 4px;font-size:15.5px;font-weight:700;}
 .dining-section h4{margin:16px 0 8px;font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:8px;font-weight:700;}
 .haul-example{color:var(--muted);font-size:12px;margin:0 0 14px;}
-.badge{display:inline-block;background:var(--accent-tint);color:var(--accent);border-radius:999px;padding:3px 11px;font-size:11px;font-weight:700;}
+.badge{display:inline-block;background:var(--accent-tint);color:var(--accent-text);border-radius:999px;padding:3px 11px;font-size:11px;font-weight:700;}
 .badge.business{background:var(--business-tint);color:var(--business);}
-.badge-live{background:#e6f6ec;color:var(--good);}
+.badge-live{background:var(--good-bg);color:var(--good-text);}
 .badge-muted{background:var(--border-soft);color:var(--muted);}
 
 /* ---------- Fleet selector (home page) ---------- */
@@ -224,7 +269,7 @@ body.mode-customer .hero-controls{display:none;}
 .fleet-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;}
 .aircraft-card{
   display:block;text-decoration:none;color:var(--text);
-  background:#fafaf6;border:1px solid var(--border-soft);border-radius:14px;
+  background:var(--surface-2);border:1px solid var(--border-soft);border-radius:14px;
   padding:22px 20px;transition:transform .08s ease, box-shadow .08s ease, border-color .08s ease;
 }
 .aircraft-card:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(20,16,10,.1);border-color:var(--emirates-red);}
@@ -238,17 +283,17 @@ body.mode-customer .hero-controls{display:none;}
 .courses{margin:0 0 4px;padding-left:22px;color:var(--text);}
 .courses li{margin-bottom:6px;line-height:1.4;}
 .wine-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:8px;margin-top:8px;}
-.wine-chk{background:#fff;border:1px solid var(--border);border-radius:9px;padding:9px 11px;}
+.wine-chk{background:var(--card-bg);border:1px solid var(--border);border-radius:9px;padding:9px 11px;}
 .dining-note{color:var(--muted);font-size:12px;font-style:italic;margin-top:16px;}
 
 .veg-choice{display:flex;flex-direction:column;gap:10px;margin-top:4px;}
-.radio-row{display:flex;gap:12px;align-items:flex-start;padding:13px;border:1px solid var(--border);border-radius:11px;cursor:pointer;background:#fff;}
+.radio-row{display:flex;gap:12px;align-items:flex-start;padding:13px;border:1px solid var(--border);border-radius:11px;cursor:pointer;background:var(--card-bg);}
 .radio-row input{margin-top:3px;width:16px;height:16px;cursor:pointer;accent-color:var(--emirates-red);}
 .dish-name{color:var(--muted);font-size:12.5px;margin-top:2px;}
-.snack-note{background:#fff;border:1px solid var(--border);border-radius:11px;padding:14px;font-size:13.5px;color:var(--text);}
+.snack-note{background:var(--card-bg);border:1px solid var(--border);border-radius:11px;padding:14px;font-size:13.5px;color:var(--text);}
 
 /* ---------- Order-food / AI suggestion link ---------- */
-.ai-suggestion-section{background:#fafaf6;border:1px dashed var(--border);border-radius:14px;padding:18px 20px 22px;}
+.ai-suggestion-section{background:var(--surface-2);border:1px dashed var(--border);border-radius:14px;padding:18px 20px 22px;}
 .ai-suggestion-section h3{margin:0 0 8px;font-size:15.5px;font-weight:700;display:flex;align-items:center;gap:10px;}
 .ai-badge{background:var(--economy-tint);color:var(--economy);}
 .ai-suggestion-section p{color:var(--muted);font-size:13px;line-height:1.5;margin:0 0 14px;}
@@ -263,14 +308,14 @@ body.mode-customer .hero-controls{display:none;}
 .panel-controls{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:20px;}
 .panel-controls .control-group label{color:var(--muted);}
 .panel-controls .control-group select{
-  background:#fff;color:var(--text);border:1px solid var(--border);
+  background:var(--card-bg);color:var(--text);border:1px solid var(--border);
 }
 .panel-controls .control-group select option{color:var(--text);}
 
 /* ---------- Crew read-only seat summary ---------- */
 .crew-summary{
   display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;
-  background:#fafaf6;border:1px solid var(--border-soft);border-radius:12px;
+  background:var(--surface-2);border:1px solid var(--border-soft);border-radius:12px;
   padding:16px 18px;margin-bottom:20px;
 }
 .crew-row{display:flex;flex-direction:column;gap:4px;font-size:13.5px;}
@@ -287,13 +332,13 @@ body.mode-customer .hero-controls{display:none;}
   margin-bottom:14px;
 }
 .role-icon-badge svg{width:24px;height:24px;}
-.role-icon-customer{background:var(--accent-tint);color:var(--accent);}
+.role-icon-customer{background:var(--accent-tint);color:var(--accent-text);}
 .role-icon-crew{background:var(--emirates-navy);color:#fff;}
 .role-card .aircraft-meta{justify-content:space-between;}
 .role-card-arrow{color:var(--muted);font-size:16px;opacity:0;transition:opacity .15s ease, transform .15s ease;transform:translateX(-4px);}
 .role-card:hover .role-card-arrow{opacity:1;transform:translateX(0);}
 .modal-overlay{
-  position:fixed;inset:0;background:rgba(20,16,10,.55);
+  position:fixed;inset:0;background:var(--overlay);
   display:flex;align-items:center;justify-content:center;z-index:50;
 }
 .modal-overlay[hidden]{display:none;}
@@ -316,12 +361,12 @@ body.mode-customer .hero-controls{display:none;}
 .menu-tabs-card{display:flex;flex-direction:column;gap:14px;}
 .tab-row{display:flex;gap:10px;flex-wrap:wrap;}
 .tab-btn{
-  background:#fafaf6;color:var(--text);border:1.5px solid var(--border);
+  background:var(--surface-2);color:var(--text);border:1.5px solid var(--border);
   border-radius:999px;padding:10px 20px;font-size:13.5px;font-weight:700;cursor:pointer;
 }
 .tab-btn.active{background:var(--emirates-red);color:#fff;border-color:var(--emirates-red);}
-.tab-row-secondary .tab-btn-secondary{padding:7px 16px;font-size:12.5px;background:#fff;}
-.tab-row-secondary .tab-btn-secondary.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+.tab-row-secondary .tab-btn-secondary{padding:7px 16px;font-size:12.5px;background:var(--card-bg);}
+.tab-row-secondary .tab-btn-secondary.active{background:var(--accent-text);border-color:var(--accent-text);color:var(--on-accent-text);}
 
 .menu-section{margin-bottom:28px;}
 .menu-section-title{font-size:18px;font-weight:800;margin:0 0 14px;color:var(--text);}
@@ -336,7 +381,7 @@ body.mode-customer .hero-controls{display:none;}
 
 .dish-scroll-btn{
   flex:0 0 auto;width:34px;height:34px;border-radius:50%;
-  border:1px solid var(--border);background:#fff;color:var(--text);
+  border:1px solid var(--border);background:var(--card-bg);color:var(--text);
   font-size:18px;cursor:pointer;line-height:1;
 }
 .dish-scroll-btn:hover{background:var(--border-soft);}
@@ -369,15 +414,35 @@ body.mode-customer .hero-controls{display:none;}
 .dish-card-select:has(input:checked){outline:2px solid var(--emirates-red);outline-offset:1px;}
 
 @media (max-width: 639px){
-  /* crew pages carry up to six top-bar links; keep them on one line on a phone */
-  .topbar-inner{padding:0 12px;gap:10px;}
-  .wordmark{font-size:16px;flex:0 0 auto;}
-  .topbar-nav{gap:11px;min-width:0;overflow-x:auto;scrollbar-width:none;}
+  /* The top bar becomes two rows: logo (and theme toggle) above, links below, so a
+     long crew menu is never clipped and every link stays an easy tap target. */
+  .topbar-inner{height:auto;min-height:50px;flex-wrap:wrap;align-content:center;padding:6px 14px 0;row-gap:0;}
+  .topbar-nav{order:3;flex:1 1 100%;gap:18px;min-width:0;overflow-x:auto;scrollbar-width:none;}
   .topbar-nav::-webkit-scrollbar{display:none;}
-  .topbar-nav a{font-size:12px;white-space:nowrap;flex:0 0 auto;}
+  .topbar-nav a{font-size:13px;padding:11px 0 12px;white-space:nowrap;flex:0 0 auto;}
 }
 
 @media (max-width: 760px){
   .hero{flex-direction:column;align-items:flex-start;}
   .hero h1{font-size:30px;}
+}
+
+/* ---------- Theme toggle (added to every top bar by js/theme.js) ---------- */
+.topbar-nav{margin-left:auto;}
+.topbar-inner .op-live{margin-left:auto;}
+.theme-toggle{
+  flex:0 0 auto;margin-left:18px;width:38px;height:38px;border-radius:50%;
+  border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.06);color:#e9e6df;
+  display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0;
+}
+.theme-toggle:hover{background:rgba(255,255,255,.14);}
+.theme-toggle svg{width:18px;height:18px;}
+.theme-toggle .icon-sun{display:none;}
+:root[data-theme="dark"] .theme-toggle .icon-sun{display:block;}
+:root[data-theme="dark"] .theme-toggle .icon-moon{display:none;}
+:root[data-theme="dark"] .topbar{border-bottom:1px solid #2b2b28;}
+@media (max-width: 639px){
+  .topbar-nav{margin-left:0;}
+  .topbar-inner .op-live{margin-left:auto;}
+  .theme-toggle{margin-left:auto;order:2;width:36px;height:36px;}
 }

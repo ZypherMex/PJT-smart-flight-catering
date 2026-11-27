@@ -7,6 +7,7 @@ const CREW_LINKS = [
   { key: 'seatmap', label: 'Seat Map', href: 'a350.html?mode=crew' },
   { key: 'orders', label: 'Orders', href: 'crew.html' },
   { key: 'admin', label: 'Admin', href: 'admin.html' },
+  { key: 'qr', label: 'QR', href: 'qr.html' },
   { key: 'dining', label: 'Dining', href: 'menu.html' },
 ];
 

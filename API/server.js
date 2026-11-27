@@ -3,6 +3,7 @@ require('dotenv').config();
 const http = require('http');
 const app = require('./app');
 const { initSocket } = require('./realtime/socket');
+const { getAccessUrls } = require('./services/networkService');
 const { migrateSeatPreferencesColumns, seedSeatsIfEmpty, seedMenuIfEmpty, syncMenuImages } = require('./db/seed');
 const {
   migrateMenuColumns,
@@ -11,6 +12,7 @@ const {
   seedHealthConditionsIfEmpty,
   migrateSeatConditionsFromColumns,
   capSeatConditionsOnce,
+  migrateMenuImagesToWebp,
   tagUnreviewedMenuItems,
 } = require('./db/migrate');
 
@@ -32,6 +34,8 @@ migrateOrderColumns();
 const categorizedCount = backfillMenuCategories();
 if (categorizedCount) console.log(`Menu categories assigned (${categorizedCount} items).`);
 
+const webpMoved = migrateMenuImagesToWebp();
+if (webpMoved) console.log(`Dish photos switched to optimised WebP (${webpMoved} dishes).`);
 const syncedImageCount = syncMenuImages();
 console.log(`Menu photos synced (${syncedImageCount} items updated).`);
 
@@ -51,6 +55,14 @@ initSocket(server);
 
 server.listen(PORT, HOST, () => {
   console.log(`Smart Flight Catering app running at http://localhost:${PORT}`);
+  const urls = getAccessUrls(PORT);
+  if (urls.length) {
+    console.log('Passengers on the same network can open:');
+    urls.forEach((entry) => console.log(`  ${entry.url}/order.html   (${entry.interface})`));
+    console.log('Crew: sign in and open QR in the menu to print the passenger QR code.');
+  } else {
+    console.log('No network address found: connect this computer to the Wi-Fi/network passengers will use.');
+  }
 });
 
 //This is is a NGL I REALLY WANNA PUSH ITcomment i hope nothing breaks while it is at it.

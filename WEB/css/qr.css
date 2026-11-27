@@ -1,0 +1,56 @@
+/* QR page. The printable sheet (#printSheet) is the only thing that prints. */
+
+.qr-header{background:linear-gradient(135deg,#1c1510 0%,#2a2018 45%,#3a2a1a 100%);color:#fff;padding:24px 20px 22px;}
+.qr-header-inner{max-width:760px;margin:0 auto;}
+.qr-header h1{margin:4px 0 8px;font-size:30px;font-weight:800;letter-spacing:-.01em;line-height:1.1;}
+.qr-header p{margin:0;color:#d8d2c6;font-size:14px;line-height:1.55;max-width:560px;}
+
+.qr-main{max-width:760px;margin:0 auto;padding:18px 16px 60px;display:flex;flex-direction:column;gap:16px;}
+.qr-card{background:var(--card-bg);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);padding:18px 20px;}
+.qr-card h2{margin:0 0 4px;font-size:17px;font-weight:800;}
+.qr-note{margin:0 0 14px;color:var(--muted);font-size:13px;line-height:1.5;}
+
+.qr-field{display:flex;flex-direction:column;gap:6px;margin-bottom:12px;}
+.qr-field label{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);}
+.qr-field label span{text-transform:none;letter-spacing:0;font-weight:500;}
+.qr-field select,.qr-field input{min-height:48px;padding:0 12px;font-size:16px;font-family:inherit;border:1.5px solid var(--border);border-radius:12px;background:var(--card-bg);color:var(--text);width:100%;}
+.qr-field select:focus,.qr-field input:focus{outline:none;border-color:var(--emirates-red);}
+.qr-inline{display:flex;gap:10px;}
+.qr-error{color:var(--danger);font-size:13px;font-weight:600;}
+
+.qr-sheet{text-align:center;padding:28px 20px;}
+.qr-sheet-title{font-size:30px;font-weight:800;letter-spacing:-.01em;margin-bottom:14px;}
+.qr-code{display:flex;justify-content:center;margin:0 auto 14px;}
+.qr-code img{width:min(320px,80vw);height:auto;background:#fff;padding:10px;border-radius:14px;border:1px solid var(--border);}
+.qr-loading{color:var(--muted);font-size:14px;padding:40px 10px;max-width:420px;line-height:1.5;}
+.qr-sheet-sub{font-size:17px;font-weight:700;margin-bottom:6px;}
+.qr-link{font-size:14px;font-weight:600;color:var(--muted);word-break:break-all;margin-bottom:10px;}
+.qr-sheet-fine{font-size:12px;color:var(--muted);}
+
+.qr-actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;}
+.qr-btn{min-height:50px;padding:0 22px;border-radius:12px;border:1.5px solid var(--border);background:var(--card-bg);color:var(--text);font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;text-decoration:none;white-space:nowrap;}
+.qr-btn:hover{filter:brightness(.96);}
+.qr-btn-primary{background:var(--emirates-red);border-color:var(--emirates-red);color:#fff;}
+
+.qr-help ol{margin:8px 0 0;padding-left:20px;color:var(--text);font-size:13.5px;line-height:1.6;}
+.qr-help li{margin-bottom:6px;}
+.qr-help code{background:var(--surface-2);padding:1px 6px;border-radius:5px;font-size:12.5px;}
+
+.qr-toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:80;padding:12px 20px;border-radius:12px;font-size:14px;font-weight:700;color:#fff;background:#1f6b3e;box-shadow:0 8px 24px rgba(0,0,0,.3);}
+
+@media print{
+  body{background:#fff !important;}
+  .topbar,.qr-header,.qr-controls,.qr-actions,.qr-help,.qr-toast{display:none !important;}
+  .qr-main{padding:0;max-width:none;}
+  .qr-sheet{border:0;box-shadow:none;background:#fff !important;color:#000 !important;padding:40px 0;}
+  .qr-sheet *{color:#000 !important;}
+  .qr-sheet-title{font-size:44px;}
+  .qr-code img{width:11cm;border:0;padding:0;}
+  .qr-sheet-sub{font-size:24px;}
+  .qr-link{font-size:18px;}
+}
+
+@media (max-width:560px){
+  .qr-inline{flex-direction:column;}
+  .qr-actions .qr-btn{flex:1 1 45%;}
+}

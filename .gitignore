@@ -5,3 +5,4 @@ DATABASE/*.sqlite-shm
 DATABASE/*.sqlite-journal
 npm-debug.log*
 .env
+DATABASE/backups/

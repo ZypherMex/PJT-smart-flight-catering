@@ -47,9 +47,9 @@
 .ad-name{font-size:15px;font-weight:800;line-height:1.3;overflow-wrap:anywhere;}
 .ad-badges{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px;align-items:center;}
 .ad-badge{background:var(--surface-2);border:1px solid var(--border-soft);border-radius:999px;padding:2px 9px;font-size:11px;font-weight:700;color:var(--muted);}
-.ad-badge-warn{background:#fdf0d5;border-color:#f0d9a0;color:#8a5a00;}
-.ad-badge-red{background:#fde8ec;border-color:#f6c9d2;color:var(--danger);}
-.ad-badge-class-First{background:var(--accent-tint);color:var(--accent);border-color:transparent;}
+.ad-badge-warn{background:var(--warn-bg);border-color:var(--warn-border);color:var(--warn-fg);}
+.ad-badge-red{background:var(--danger-bg);border-color:var(--danger-border);color:var(--danger);}
+.ad-badge-class-First{background:var(--accent-tint);color:var(--accent-text);border-color:transparent;}
 .ad-badge-class-Business{background:var(--business-tint);color:var(--business);border-color:transparent;}
 .ad-badge-class-Economy{background:var(--economy-tint);color:var(--economy);border-color:transparent;}
 
@@ -78,10 +78,10 @@
 .ad-tagchip small{color:var(--muted);font-size:11px;}
 .ad-tagchip button{width:26px;height:26px;border:0;border-radius:50%;background:var(--surface-2);color:var(--danger);font-size:16px;line-height:1;cursor:pointer;}
 .ad-tagchip-ingredient b{color:var(--economy);}
-.ad-tagchip-nutrition b{color:#8a5a00;}
+.ad-tagchip-nutrition b{color:var(--warn-fg);}
 
 /* modal */
-.ad-modal-overlay{position:fixed;inset:0;z-index:60;background:rgba(20,16,10,.55);display:flex;align-items:flex-start;justify-content:center;padding:24px 12px;overflow-y:auto;}
+.ad-modal-overlay{position:fixed;inset:0;z-index:60;background:var(--overlay);display:flex;align-items:flex-start;justify-content:center;padding:24px 12px;overflow-y:auto;}
 .ad-modal{background:var(--card-bg);border-radius:18px;width:100%;max-width:640px;padding:20px 22px 22px;box-shadow:0 20px 60px rgba(0,0,0,.35);}
 .ad-modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
 .ad-modal-head h3{margin:0;font-size:19px;font-weight:800;}
@@ -100,7 +100,7 @@
 .ad-check > span{font-size:14px;font-weight:700;text-transform:none;letter-spacing:0;color:var(--text);}
 .ad-section-label{margin:18px 0 4px;font-size:12px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);}
 .ad-note{margin:2px 0 10px;color:var(--muted);font-size:12.5px;line-height:1.5;}
-.ad-callout{background:#fdf0d5;color:#8a5a00;border-radius:12px;padding:12px 14px;font-size:13px;line-height:1.5;margin-bottom:14px;font-weight:600;}
+.ad-callout{background:var(--warn-bg);color:var(--warn-fg);border-radius:12px;padding:12px 14px;font-size:13px;line-height:1.5;margin-bottom:14px;font-weight:600;}
 .ad-pill-group{margin-bottom:10px;}
 .ad-pill-title{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
 .ad-pills{display:flex;flex-wrap:wrap;gap:7px;}
@@ -114,7 +114,7 @@
 .ad-photo-preview img{width:100%;height:100%;object-fit:cover;display:block;}
 .ad-photo-controls{flex:1 1 220px;}
 .ad-photo-controls input[type="file"]{font-size:14px;max-width:100%;margin-bottom:6px;}
-.ad-error{background:#fde8ec;color:var(--danger);border-radius:10px;padding:10px 14px;margin-top:14px;font-size:13.5px;font-weight:700;}
+.ad-error{background:var(--danger-bg);color:var(--danger);border-radius:10px;padding:10px 14px;margin-top:14px;font-size:13.5px;font-weight:700;}
 .ad-modal-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:20px;padding-top:16px;border-top:1px solid var(--border-soft);}
 .ad-spacer{flex:1 1 auto;}
 

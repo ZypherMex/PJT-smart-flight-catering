@@ -1,44 +1,24 @@
-const { getSeat } = require('./seatModel');
-const { getPreferences, getSelectedConditions } = require('./preferenceModel');
-const { getFlatMenu } = require('./menuModel');
-const { getConflicts } = require('./compatibilityModel');
+const { getPortalMenu } = require('./orderModel');
 
-// Flattens the seat's four checkbox groups (allergies, intolerances, medical
-// conditions, other/dietary) into one list — this IS the passenger's health
-// conditions + dietary restrictions, taken directly from the checkboxes
-// already saved for this seat. No separate health-conditions list.
-function flattenChecks(checks) {
-  return [
-    ...checks.allergies,
-    ...checks.intolerances,
-    ...checks.medicalConditions,
-    ...checks.other,
-  ];
-}
+// Builds everything the Claude call needs for one passenger. The passenger's
+// conditions come from the request (never from stored seat data, which would let
+// anyone read another seat's health information). The menu is the same
+// class + flight-length menu the ordering portal shows, minus anything the
+// passenger can't have — conflicting with their conditions, sold out or switched
+// off — so the AI is never even offered a dish they couldn't order.
+function buildRecommendationContext(seatId, haulLength, conditions) {
+  const menu = getPortalMenu(seatId, haulLength, conditions.map((condition) => condition.id));
 
-// Builds everything the Claude recommendation call needs for one seat: its
-// real cabin class (from the DB, never trusted from the client), its saved
-// health/dietary checkboxes, and the exact menu rows available for that
-// class+haul — the only meals Claude is allowed to recommend from.
-function buildRecommendationContext(seatId, haulLength) {
-  const seat = getSeat(seatId);
-  if (!seat) return null;
-
-  const preferences = getPreferences(seatId);
-  const healthConditions = flattenChecks(preferences.checks);
-  // Dishes that conflict with the passenger's conditions are removed before the
-  // menu is sent, so the AI can never recommend one — claudeClient's existing
-  // "only IDs from the sent menu" filter then enforces this on the way back too.
-  const conditionIds = getSelectedConditions(seatId).map((condition) => condition.id);
-  const availableMenu = getFlatMenu(seat.classType, haulLength).filter(
-    (item) => getConflicts(item.id, conditionIds).length === 0
-  );
+  const availableMenu = menu.categories
+    .flatMap((group) => group.items)
+    .filter((item) => !item.soldOut && item.conflicts.length === 0)
+    .map(({ id, name, description, category }) => ({ id, name, description, category }));
 
   return {
     seatId,
-    flightClass: seat.classType,
+    flightClass: menu.seat.classType,
     haulLength,
-    healthConditions,
+    healthConditions: conditions.map((condition) => condition.label),
     availableMenu,
   };
 }

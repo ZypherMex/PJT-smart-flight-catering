@@ -15,7 +15,7 @@ const router = express.Router();
 // Orders are open to anyone on the network, so cap how fast one device can submit.
 const orderLimiter = rateLimit({
   windowMs: 60 * 1000,
-  limit: 60,
+  limit: Number(process.env.ORDER_RATE_LIMIT) || 60,
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'Too many requests. Please slow down.' },

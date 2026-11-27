@@ -76,7 +76,10 @@ function fitSeatMapToViewport() {
   const naturalWidth = scaleEl.scrollWidth;
   const scale = Math.min(1, availableWidth / naturalWidth);
   scaleEl.style.transform = `scale(${scale})`;
-  viewport.style.height = `${scaleEl.getBoundingClientRect().height}px`;
+  // The box includes its own padding and border, so they are added to the map's scaled height.
+  const paddingY = parseFloat(viewportStyles.paddingTop) + parseFloat(viewportStyles.paddingBottom);
+  const borderY = parseFloat(viewportStyles.borderTopWidth) + parseFloat(viewportStyles.borderBottomWidth);
+  viewport.style.height = `${scaleEl.getBoundingClientRect().height + paddingY + borderY}px`;
 }
 
 export function renderSeatMap(gridConfig, seats, onSeatClick) {
@@ -96,6 +99,7 @@ export function renderSeatMap(gridConfig, seats, onSeatClick) {
 
   fitSeatMapToViewport();
   window.addEventListener('resize', fitSeatMapToViewport);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitSeatMapToViewport); // text width can change once fonts load
 }
 
 export function highlightSelectedSeat(seatId) {
