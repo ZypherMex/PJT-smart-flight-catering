@@ -1,5 +1,6 @@
 import { getFleet } from './api.js';
 import { verifyCrewSession } from './crewAuth.js';
+import { mountCrewNav } from './crewNav.js';
 
 function renderFleetCard(aircraft) {
   const isAvailable = aircraft.status === 'available';
@@ -28,6 +29,7 @@ async function init() {
     window.location.replace('index.html');
     return;
   }
+  mountCrewNav('fleet');
 
   const grid = document.getElementById('fleetGrid');
   try {

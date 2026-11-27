@@ -3,6 +3,7 @@ import { renderSeatMap, highlightSelectedSeat, setSeatHasPrefs } from './seatGri
 import { openSeatPanel, closePanel } from './preferencePanel.js';
 import { openCrewPanel, closeCrewPanel } from './crewPanel.js';
 import { verifyCrewSession } from './crewAuth.js';
+import { mountCrewNav } from './crewNav.js';
 
 const mode = new URLSearchParams(window.location.search).get('mode') === 'crew' ? 'crew' : 'customer';
 
@@ -96,6 +97,7 @@ document.addEventListener('panel-closed', () => {
 
 async function init() {
   if (!(await guardCrewAccess())) return;
+  if (mode === 'crew') mountCrewNav('seatmap');
   document.body.classList.add(mode === 'crew' ? 'mode-crew' : 'mode-customer');
 
   const [gridConfig, seats, diningMatrix] = await Promise.all([getGridConfig(), getAllSeats(), getDiningMatrix()]);

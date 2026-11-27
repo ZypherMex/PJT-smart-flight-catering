@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Order board — Cabin Crew</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/crew.css">
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="wordmark" href="index.html">fly<span>cater</span><span class="dot">.</span></a>
+      <nav class="topbar-nav"></nav>
+    </div>
+  </header>
+
+  <section class="cr-header">
+    <div class="cr-header-inner">
+      <div>
+        <div class="hero-eyebrow">Cabin crew</div>
+        <h1>Order board</h1>
+      </div>
+      <div class="cr-live-box">
+        <span class="op-live" id="liveIndicator">Connecting&hellip;</span>
+        <span class="cr-updated" id="lastUpdated"></span>
+      </div>
+    </div>
+  </section>
+
+  <main class="cr-main">
+
+    <div class="cr-banner" id="banner" role="alert" hidden></div>
+
+    <div class="cr-status-chips" id="statusChips" role="group" aria-label="Filter by status"></div>
+
+    <section class="cr-controls">
+      <div class="cr-control cr-control-search">
+        <label for="searchInput">Seat</label>
+        <input id="searchInput" type="search" inputmode="text" autocomplete="off" autocapitalize="characters" placeholder="Search seat, e.g. 12A">
+      </div>
+      <div class="cr-control">
+        <label for="classFilter">Cabin class</label>
+        <select id="classFilter">
+          <option value="">All classes</option>
+          <option value="First">First</option>
+          <option value="Business">Business</option>
+          <option value="Economy">Economy</option>
+        </select>
+      </div>
+      <div class="cr-control">
+        <label for="conditionFilter">Health condition</label>
+        <select id="conditionFilter"><option value="">Any condition</option></select>
+      </div>
+      <div class="cr-control cr-control-buttons">
+        <button type="button" class="cr-btn" id="sortBtn" aria-label="Toggle seat sort order">Seat &uarr;</button>
+        <button type="button" class="cr-btn cr-btn-ghost" id="clearBtn" hidden>Clear filters</button>
+      </div>
+    </section>
+
+    <div class="cr-board">
+      <div class="cr-head" aria-hidden="true">
+        <div>Seat</div>
+        <div>Health conditions</div>
+        <div>Snack</div>
+        <div>Breakfast</div>
+        <div>Lunch</div>
+        <div>Dinner</div>
+        <div>Champagne / Beverage</div>
+        <div>Status</div>
+      </div>
+      <div id="orderList" class="cr-list"></div>
+      <div class="cr-empty" id="emptyState" hidden></div>
+    </div>
+
+  </main>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script type="module" src="js/crew.js"></script>
+</body>
+</html>
