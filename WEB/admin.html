@@ -6,6 +6,7 @@
 <title>Admin — Smart Catering</title>
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/admin.css">
+<link rel="stylesheet" href="css/reports.css">
 </head>
 <body>
 
@@ -28,6 +29,7 @@
     <div class="ad-tabs" role="tablist">
       <button type="button" class="ad-tab is-active" role="tab" data-tab="meals">Meals</button>
       <button type="button" class="ad-tab" role="tab" data-tab="rules">Health rules</button>
+      <button type="button" class="ad-tab" role="tab" data-tab="reports">Reports</button>
     </div>
 
     <!-- ===== Meals ===== -->
@@ -74,13 +76,36 @@
       <div id="tagList"></div>
     </section>
 
+    <!-- ===== Reports ===== -->
+    <section id="tab-reports" hidden>
+      <div class="rp-filterbar">
+        <div class="ad-tool">
+          <label for="rpClass">Cabin class</label>
+          <select id="rpClass">
+            <option value="">All classes</option>
+            <option value="First">First</option>
+            <option value="Business">Business</option>
+            <option value="Economy">Economy</option>
+          </select>
+        </div>
+        <button type="button" class="ad-btn" id="rpRefresh">Refresh</button>
+        <span class="rp-updated" id="rpUpdated"></span>
+        <span class="ad-spacer"></span>
+        <button type="button" class="ad-btn" id="rpExcel">Download Excel</button>
+        <button type="button" class="ad-btn" id="rpPdf">Download PDF</button>
+      </div>
+      <div class="rp" id="rpBody"><div class="ad-empty">Loading report&hellip;</div></div>
+    </section>
+
   </main>
 
   <div class="ad-modal-overlay" id="modal" hidden>
     <div class="ad-modal" id="modalBox" role="dialog" aria-modal="true"></div>
   </div>
+  <div class="rp-tip" id="rpTip" role="tooltip" hidden></div>
   <div class="ad-toast" id="toast" role="status" hidden></div>
 
+  <script src="/socket.io/socket.io.js"></script>
   <script type="module" src="js/admin.js"></script>
 </body>
 </html>

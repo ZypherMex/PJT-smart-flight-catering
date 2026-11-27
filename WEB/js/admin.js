@@ -4,8 +4,9 @@ import { adminApi } from './adminApi.js';
 import { shared, initModalDismissal, errorText, toast } from './adminUi.js';
 import { initMeals } from './adminMeals.js';
 import { initConditions } from './adminConditions.js';
+import { initReports, refreshReports } from './adminReports.js';
 
-const loaded = { meals: false, rules: false };
+const loaded = { meals: false, rules: false, reports: false };
 
 async function showTab(name) {
   document.querySelectorAll('.ad-tab').forEach((tab) => {
@@ -15,12 +16,16 @@ async function showTab(name) {
   });
   document.getElementById('tab-meals').hidden = name !== 'meals';
   document.getElementById('tab-rules').hidden = name !== 'rules';
+  document.getElementById('tab-reports').hidden = name !== 'reports';
   history.replaceState(null, '', name === 'meals' ? 'admin.html' : `admin.html#${name}`);
+
+  if (name === 'reports' && loaded.reports) refreshReports(); // numbers may have moved while it was hidden
 
   // Each tab loads its data the first time it is opened.
   if (loaded[name]) return;
   loaded[name] = true;
-  await (name === 'meals' ? initMeals() : initConditions());
+  const starters = { meals: initMeals, rules: initConditions, reports: initReports };
+  await starters[name]();
 }
 
 async function init() {
@@ -43,7 +48,8 @@ async function init() {
     if (tab) showTab(tab.dataset.tab);
   });
 
-  await showTab(window.location.hash === '#rules' ? 'rules' : 'meals');
+  const hash = window.location.hash.slice(1);
+  await showTab(['rules', 'reports'].includes(hash) ? hash : 'meals');
 }
 
 init();

@@ -1,6 +1,7 @@
 const express = require('express');
 const multer = require('multer');
 const c = require('../controllers/adminController');
+const report = require('../controllers/reportController');
 const { requireCrew } = require('../middleware/crewAuth');
 
 const router = express.Router();
@@ -31,6 +32,10 @@ router.get('/admin/conditions', c.listConditionsHandler);
 router.post('/admin/conditions', c.createConditionHandler);
 router.put('/admin/conditions/:id', c.updateConditionHandler);
 router.delete('/admin/conditions/:id', c.deleteConditionHandler);
+
+router.get('/admin/reports/summary', report.summaryHandler);
+router.get('/admin/export/orders.xlsx', wrap(report.exportExcelHandler));
+router.get('/admin/export/orders.pdf', report.exportPdfHandler);
 
 router.post('/admin/tags', c.createTagHandler);
 router.delete('/admin/tags/:tag', c.deleteTagHandler);

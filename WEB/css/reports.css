@@ -1,0 +1,103 @@
+/* Reports tab. Chart colours follow the dataviz palette: one categorical hue
+   (blue, slot 1) for single-series charts, a lighter step of the same ramp for
+   meter tracks, and the reserved warning / critical colours only for stock state.
+   The dark values apply under [data-theme="dark"] (set by the site's theme toggle). */
+
+.rp{
+  --rp-s1:#2a78d6;
+  --rp-track:#cde2fb;
+  --rp-warn:#fab219;
+  --rp-crit:#d03b3b;
+  --rp-grid:#e1e0d9;
+  --rp-baseline:#c3c2b7;
+  --rp-surface:var(--card-bg);
+}
+:root[data-theme="dark"] .rp{
+  --rp-s1:#3987e5;
+  --rp-track:#0d366b;
+  --rp-grid:#2c2c2a;
+  --rp-baseline:#383835;
+}
+.rp.is-loading{opacity:.6;transition:opacity .15s ease;}
+
+/* filter row — one row above everything it scopes */
+.rp-filterbar{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;margin-bottom:16px;}
+.rp-updated{align-self:center;font-size:12.5px;color:var(--muted);font-weight:600;}
+
+/* headline figures */
+.rp-kpis{display:grid;grid-template-columns:minmax(220px,1.3fr) repeat(4,minmax(150px,1fr));gap:12px;margin-bottom:16px;}
+.rp-hero,.rp-tile{background:var(--card-bg);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);padding:16px 18px;}
+.rp-label{font-size:12.5px;font-weight:700;color:var(--muted);}
+.rp-hero-value{font-size:56px;font-weight:800;line-height:1.05;margin:4px 0 2px;letter-spacing:-.02em;color:var(--text);}
+.rp-value{font-size:30px;font-weight:700;line-height:1.1;margin:6px 0 2px;color:var(--text);}
+.rp-note{font-size:12px;color:var(--muted);font-weight:600;}
+
+/* cards */
+.rp-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;}
+.rp-card{background:var(--card-bg);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);padding:18px 20px 16px;min-width:0;}
+.rp-wide{grid-column:1 / -1;}
+.rp-card h3{margin:0;font-size:16px;font-weight:800;color:var(--text);}
+.rp-sub{margin:2px 0 14px;font-size:12.5px;color:var(--muted);line-height:1.45;}
+.rp-empty{margin:18px 0 8px;color:var(--muted);font-size:14px;}
+
+/* horizontal bars: <= 24px thick, rounded data-end, square at the baseline */
+.rp-bars{display:flex;flex-direction:column;gap:8px;}
+.rp-bar-row{display:grid;grid-template-columns:minmax(110px,34%) minmax(0,1fr);align-items:center;gap:12px;min-height:34px;border-radius:8px;}
+.rp-bar-row:hover,.rp-bar-row:focus-visible{background:var(--surface-2);outline:none;}
+.rp-bar-label{font-size:13px;font-weight:600;color:var(--text);line-height:1.25;overflow-wrap:anywhere;}
+.rp-bar-label small{display:block;font-size:11px;font-weight:500;color:var(--muted);}
+.rp-bar-area{display:flex;align-items:center;gap:8px;border-left:1px solid var(--rp-baseline);padding:4px 0;min-width:0;}
+.rp-bar{display:block;height:18px;background:var(--rp-s1);border-radius:0 4px 4px 0;flex:0 1 auto;max-width:calc(100% - 44px);}
+.rp-bar-value{font-size:13px;font-weight:700;color:var(--text);padding-left:6px;white-space:nowrap;}
+.rp-bar-value.is-zero{color:var(--muted);font-weight:600;}
+
+/* columns */
+.rp-cols{display:flex;gap:6px;align-items:stretch;overflow-x:auto;padding-bottom:2px;}
+.rp-col-wrap{display:flex;flex-direction:column;align-items:center;flex:1 0 34px;max-width:64px;border-radius:8px;}
+.rp-col-wrap:hover,.rp-col-wrap:focus-visible{background:var(--surface-2);outline:none;}
+.rp-col-slot{height:130px;width:100%;display:flex;align-items:flex-end;justify-content:center;border-bottom:1px solid var(--rp-baseline);}
+.rp-col{display:block;width:100%;max-width:24px;background:var(--rp-s1);border-radius:4px 4px 0 0;}
+.rp-col-value{font-size:12.5px;font-weight:700;color:var(--text);margin-bottom:4px;min-height:16px;}
+.rp-col-value.is-zero{color:var(--muted);font-weight:600;}
+.rp-col-label{font-size:11px;color:var(--muted);margin-top:6px;font-weight:600;}
+
+/* stock meters */
+.rp-meters{display:flex;flex-direction:column;gap:6px;}
+.rp-meter-row{display:grid;grid-template-columns:minmax(150px,28%) minmax(100px,1fr) minmax(170px,26%);align-items:center;gap:14px;padding:8px 6px;border-radius:10px;}
+.rp-meter-row:hover,.rp-meter-row:focus-visible{background:var(--surface-2);outline:none;}
+.rp-meter-name{font-size:13.5px;font-weight:700;color:var(--text);line-height:1.25;overflow-wrap:anywhere;}
+.rp-meter-name small{display:block;font-size:11px;font-weight:500;color:var(--muted);}
+.rp-meter{height:10px;border-radius:5px;background:var(--rp-track);overflow:hidden;}
+.rp-fill{display:block;height:100%;border-radius:5px;background:var(--rp-s1);}
+.rp-fill-low{background:var(--rp-warn);}
+.rp-fill-soldout{background:var(--rp-crit);}
+.rp-fill-unavailable{background:var(--rp-crit);}
+.rp-meter-figure{font-size:12.5px;color:var(--muted);font-weight:600;display:flex;flex-direction:column;gap:2px;}
+.rp-state{font-size:12px;font-weight:800;color:var(--text);}
+
+/* table view (the accessible twin of every chart) */
+.rp-tableview{margin-top:14px;border-top:1px solid var(--border-soft);padding-top:8px;}
+.rp-tableview summary{cursor:pointer;font-size:12.5px;font-weight:700;color:var(--muted);padding:4px 0;}
+.rp-table{width:100%;border-collapse:collapse;margin-top:8px;font-size:13px;}
+.rp-table th{text-align:left;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);padding:6px 8px;border-bottom:1px solid var(--rp-grid);}
+.rp-table td{padding:6px 8px;border-bottom:1px solid var(--rp-grid);color:var(--text);}
+.rp-table .rp-num{text-align:right;font-variant-numeric:tabular-nums;}
+
+/* tooltip */
+.rp-tip{position:fixed;z-index:90;pointer-events:none;max-width:320px;padding:8px 12px;border-radius:8px;font-size:12.5px;font-weight:600;line-height:1.35;background:#141414;color:#fff;box-shadow:0 6px 18px rgba(0,0,0,.3);}
+
+@media (max-width:1099px){
+  .rp-kpis{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .rp-hero{grid-column:1 / -1;}
+  .rp-grid{grid-template-columns:1fr;}
+  .rp-meter-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:"name figure" "meter meter";row-gap:6px;}
+  .rp-meter-name{grid-area:name;}
+  .rp-meter-figure{grid-area:figure;align-items:flex-end;text-align:right;}
+  .rp-meter{grid-area:meter;}
+}
+@media (max-width:560px){
+  .rp-hero-value{font-size:48px;}
+  .rp-bar-row{grid-template-columns:1fr;gap:2px;}
+  .rp-bar-area{margin-bottom:4px;}
+  .rp-filterbar .ad-btn{flex:1 1 auto;}
+}

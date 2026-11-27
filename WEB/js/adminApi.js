@@ -18,8 +18,38 @@ async function request(method, url, { body, form } = {}) {
   return json;
 }
 
+// A plain <a href> can't send the crew token, so files are fetched with it and
+// handed to the browser as a download.
+async function download(path) {
+  const res = await fetch(path, { headers: crewHeaders() });
+  if (res.status === 401) {
+    logoutCrew();
+    window.location.replace('index.html');
+    throw new ApiError(401, {});
+  }
+  if (!res.ok) throw new ApiError(res.status, await res.json().catch(() => ({})));
+
+  const match = /filename="([^"]+)"/.exec(res.headers.get('content-disposition') || '');
+  const filename = match ? match[1] : 'download';
+  const url = URL.createObjectURL(await res.blob());
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 10000);
+  return filename;
+}
+
+const classQuery = (classType) => (classType ? `?classType=${encodeURIComponent(classType)}` : '');
+
 export const adminApi = {
   meta: () => request('GET', '/api/admin/meta'),
+
+  summary: (classType) => request('GET', `/api/admin/reports/summary${classQuery(classType)}`),
+  downloadExcel: (classType) => download(`/api/admin/export/orders.xlsx${classQuery(classType)}`),
+  downloadPdf: (classType) => download(`/api/admin/export/orders.pdf${classQuery(classType)}`),
 
   listMeals: () => request('GET', '/api/admin/meals'),
   createMeal: (body) => request('POST', '/api/admin/meals', { body }),
